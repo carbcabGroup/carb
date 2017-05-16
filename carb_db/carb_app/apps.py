@@ -4,5 +4,5 @@ from __future__ import unicode_literals
 from django.apps import AppConfig
 
 
-class CarbConfig(AppConfig):
-    name = 'carb'
+class CarbAppConfig(AppConfig):
+    name = 'carb_app'
