@@ -21,6 +21,9 @@ from carb_app import views
 
 router = routers.DefaultRouter()
 router.register(r'lyft_tokens', views.LyftTokenViewSet)
+router.register(r'uber_tokens', views.UberTokenViewSet)
+router.register(r'lyft_stats', views.LyftStatsViewSet)
+router.register(r'uber_stats', views.UberStatsViewSet)
 router.register(r'users', views.UserViewSet)
 
 urlpatterns = [

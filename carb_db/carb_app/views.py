@@ -6,12 +6,33 @@ from django.contrib.auth.models import User
 
 from rest_framework import viewsets, permissions
 
-from carb_app.models import LyftToken
-from carb_app.serializers import UserSerializer, LyftTokenSerializer
+from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
+from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer
 
 class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
     serializer_class = LyftTokenSerializer
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class UberTokenViewSet(viewsets.ModelViewSet):
+    queryset = UberToken.objects.all()
+    serializer_class = UberTokenSerializer
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class LyftStatsViewSet(viewsets.ModelViewSet):
+    queryset = LyftStats.objects.all()
+    serializer_class = LyftStatsSerializer
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class UberStatsViewSet(viewsets.ModelViewSet):
+    queryset = UberStats.objects.all()
+    serializer_class = UberStatsSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
