@@ -40,6 +40,10 @@ class LyftStats(models.Model):
     vehicle_id = models.CharField(max_length=255,blank=True)
     cancel_time = models.DateTimeField(null=True,blank=True)
     vehicles_aval = models.IntegerField(null=True,blank=True)
+    travel_time = models.CharField(max_length=24,blank=True)
+    arrival_time = models.DateTimeField(null=True,blank=True)
+    dest_latitude = models.CharField(max_length=24,blank=True)
+    dest_longitude = models.CharField(max_length=24,blank=True)
     owner = models.ForeignKey('auth.User')
     updated = models.DateTimeField(auto_now_add=True)
     def __str__(self):
@@ -58,6 +62,10 @@ class UberStats(models.Model):
     vehicle_id = models.CharField(max_length=255,blank=True)
     vehicles_aval = models.IntegerField(null=True,blank=True)
     cancel_time = models.DateTimeField(null=True,blank=True)
+    travel_time = models.CharField(max_length=24,blank=True)
+    arrival_time = models.DateTimeField(null=True,blank=True)
+    dest_latitude = models.CharField(max_length=24,blank=True)
+    dest_longitude = models.CharField(max_length=24,blank=True)
     owner = models.ForeignKey('auth.User')
     updated = models.DateTimeField(auto_now_add=True)
     def __str__(self):
