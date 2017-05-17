@@ -38,6 +38,7 @@ class LyftStats(models.Model):
     ride_pickup_time = models.DateTimeField(null=True,blank=True)
     vehicle_type = models.CharField(max_length=24,blank=True)
     vehicle_id = models.CharField(max_length=255,blank=True)
+    cancel_time = models.DateTimeField(null=True,blank=True)
     vehicles_aval = models.IntegerField(null=True,blank=True)
     owner = models.ForeignKey('auth.User')
     updated = models.DateTimeField(auto_now_add=True)
@@ -56,6 +57,7 @@ class UberStats(models.Model):
     vehicle_type = models.CharField(max_length=24,blank=True)
     vehicle_id = models.CharField(max_length=255,blank=True)
     vehicles_aval = models.IntegerField(null=True,blank=True)
+    cancel_time = models.DateTimeField(null=True,blank=True)
     owner = models.ForeignKey('auth.User')
     updated = models.DateTimeField(auto_now_add=True)
     def __str__(self):
