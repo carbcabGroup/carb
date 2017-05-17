@@ -12,7 +12,7 @@ class LyftToken(models.Model):
     redirect_url =  models.CharField(max_length=1024, blank=True)
     owner = models.ForeignKey('auth.User', related_name='lyft_token', on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
+    def __unicode__(self):
         return "%s's Token" % self.owner.username
     def save(self, *args, **kwargs):
         self.updated = datetime.datetime.now()
@@ -24,7 +24,7 @@ class UberToken(models.Model):
     redirect_url =  models.CharField(max_length=1024, blank=True)
     owner = models.ForeignKey('auth.User', related_name='uber_token', on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
+    def __unicode__(self):
         return "%s's Token" % self.owner.username
     def save(self, *args, **kwargs):
         self.updated = datetime.datetime.now()
@@ -46,8 +46,8 @@ class LyftStats(models.Model):
     dest_longitude = models.CharField(max_length=24,blank=True)
     owner = models.ForeignKey('auth.User')
     updated = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.id
+    def __unicode__(self):
+        return unicode(self.id )
     def save(self, *args, **kwargs):
         self.updated = datetime.datetime.now()
         super(LyftStats, self).save(*args, **kwargs)
@@ -68,8 +68,8 @@ class UberStats(models.Model):
     dest_longitude = models.CharField(max_length=24,blank=True)
     owner = models.ForeignKey('auth.User')
     updated = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.id
+    def __unicode__(self):
+        return unicode(self.id )
     def save(self, *args, **kwargs):
         self.updated = datetime.datetime.now()
         super(UberStats, self).save(*args, **kwargs)
