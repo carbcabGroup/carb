@@ -8,13 +8,13 @@ class LyftTokenSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = LyftToken
-        fields = ('id', 'access_token', 'refresh_token', 'owner', 'updated')
+        fields = ('id', 'access_token', 'refresh_token', 'redirect_url', 'owner', 'updated')
 
 class UberTokenSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     class Meta:
         model = UberToken
-        fields = ('id', 'access_token', 'refresh_token', 'owner', 'updated')
+        fields = ('id', 'access_token', 'refresh_token', 'redirect_url', 'owner', 'updated')
 
 class LyftStatsSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
