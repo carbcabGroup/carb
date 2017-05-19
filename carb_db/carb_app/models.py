@@ -4,13 +4,16 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
 
-import datetime
+import datetime, uuid
 
 class LyftToken(models.Model):
-    access_token =  models.CharField(max_length=255, blank=True)
-    refresh_token = models.CharField(max_length=255, blank=True)
-    redirect_url =  models.CharField(max_length=1024, blank=True)
-    owner = models.ForeignKey('auth.User', related_name='lyft_token', on_delete=models.CASCADE)
+    access_token =  models.CharField(max_length=255,blank=True)
+    refresh_token = models.CharField(max_length=255,blank=True)
+    access_token_exp = models.DateTimeField(null=True,blank=True)
+    auth_uuid = models.UUIDField(primary_key=False,default=uuid.uuid4,editable=True,blank=True,null=True)
+    auth_code = models.CharField(max_length=64,blank=True)
+    auth_scope = models.CharField(max_length=255,blank=True)
+    owner = models.ForeignKey('auth.User',related_name='lyft_token',on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return "%s's Token" % self.owner.username
@@ -19,10 +22,13 @@ class LyftToken(models.Model):
         super(LyftToken, self).save(*args, **kwargs)
 
 class UberToken(models.Model):
-    access_token =  models.CharField(max_length=255, blank=True)
-    refresh_token = models.CharField(max_length=255, blank=True)
-    redirect_url =  models.CharField(max_length=1024, blank=True)
-    owner = models.ForeignKey('auth.User', related_name='uber_token', on_delete=models.CASCADE)
+    access_token =  models.CharField(max_length=255,blank=True)
+    refresh_token = models.CharField(max_length=255,blank=True)
+    access_token_exp = models.DateTimeField(null=True,blank=True)
+    auth_uuid = models.UUIDField(primary_key=False,default=uuid.uuid4,editable=True,blank=True,null=True)
+    auth_code = models.CharField(max_length=64,blank=True)
+    auth_scope = models.CharField(max_length=255,blank=True)
+    owner = models.ForeignKey('auth.User',related_name='uber_token',on_delete=models.CASCADE)
     updated = models.DateTimeField(auto_now_add=True)
     def __unicode__(self):
         return "%s's Token" % self.owner.username
