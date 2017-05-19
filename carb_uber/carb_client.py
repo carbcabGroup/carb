@@ -1,5 +1,9 @@
+import urllib
 import requests
-import collections
+#import collections
+import uuid
+import webbrowser, os, sys, subprocess
+import django
 
 # simple request only needs additional server token
 class reqSimple:
@@ -36,20 +40,34 @@ class reqOAuth2:
     def get(self, path="", **kwargs):
         # a)
         if "access_token" in self.params.keys():
-            return getOAuth2CallAPI(self.params['access_token'], path, kwargs)
+            return getOAuth2CallAPI(self.params['access_token'], path, **kwargs)
 
         # b)
 
         # c)
-        # 1) auth
-        r = self.getOAuth2Auth() # redirect to uber login
-        print r.status_code
-        print (repr(r.headers))[:1023]
-        print (repr(r.text))[:1023]
+        # 1) auth via system default browser
+        state = str(uuid.uuid4())
+        self.getOAuth2Auth(state) # redirect to uber auth
+        # uber redirects to auth.uber.com (302) and then
+        # login.uber.com (200) to present user with login first
+        # eventually directs to redirect with state/code
 
-        # 2) receive code
+        #print r.status_code
+        #print (repr(r.headers))[:1023]
+        #print (repr(r.text))[:1023]
+        #print r.history
+        #print r.url
+
+        # 2) receive code from webserver via database
+        auth_code = getOAuth2ReceiveCode(self, state)
+
         # 3) exchange for token
+        r = getOAuth2GetToken(self, auth_code)
+        print r.json()
+
         # 4) call API
+        access_token = r.json()['access_token']
+        getOAuth2CallAPI(access_token, path, **kwargs)
 
     def getSimple(self, url, path="", headers={}, **kwargs):
         if len(path) != 0:
@@ -69,21 +87,37 @@ class reqOAuth2:
 
     # params: client_id, response_type (code)
     # opt params: scope, state, redirect_uri
-    def getOAuth2Auth(self):
-        return self.getSimple(url=self.params['auth_url'],
-                              path=self.params['auth_path'],
-                              client_id=self.params['client_id'],
-                              response_type=self.params['response_type'])
+    def getOAuth2Auth(self, state):
+        query_string = urllib.urlencode({'response_type': self.params['response_type'],
+                                         'client_id': self.params['client_id'],
+                                         'state': state,
+                                         'redirect_uri': self.params['redirect_uri']})
+        url = self.params['auth_url'] + self.params['auth_path'] \
+              + '?' + query_string
+        print url
+        try:
+            webbrowser.open(url)
+        except webbrowser.Error:
+            if sys.platform == 'win32':
+                os.startfile(url)
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', url])
+            else:
+                try:
+                    subprocess.Popen(['xdg-open', url])
+                except OSError:
+                    print 'Please open a browser on: ' + url
 
-    def getOAuth2ReceiveCode(self):
+    def getOAuth2ReceiveCode(self, state):
         return
 
-    def getOAuth2GetToken(self):
-        return
+    def getOAuth2GetToken(self, auth_code):
+        headers = {}
+        return getSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='authorization_code', redirect_uri=self.params['redirect_uri'], code=auth_code)
 
     def getOAuth2CallAPI(self, access_token, path="", **kwargs):
         headers = {'Authorization' : 'Bearer %s' % access_token}
-        return getSimple(self.api_url, path, headers, **kwargs)
+        return getSimple(self.api_url, path=path, headers=headers, **kwargs)
 
 def printDiv():
     print
@@ -93,7 +127,7 @@ def printDiv():
 
 def main():
     client_id = "8mbR_i3W8ekCHYeb4xcCKbi__9OLx2pu"
-    client_secret = ""
+    client_secret = "m1S9NG_UtuK2zMlUyOktpBc2e3R60GtyTCAgZ7qD"
     server_token = "EJ0pcAbk9USM4McsYzCLOkYphlnmxWvElOEdxV74"
 
     # API Token (app server token)
@@ -124,6 +158,7 @@ def main():
     auth_path = "/oauth/v2/authorize"
     token_path = "/oauth/v2/token"
     response_type = "code"
+    redirect_uri = "https://127.0.0.1:8000/carbuberauth"
 
     api_url = "https://sandbox-api.uber.com"
     api_path = "/v1.2/products"
@@ -131,7 +166,7 @@ def main():
     t = reqOAuth2(client_id=client_id,
                   client_secret=client_secret, server_token=server_token,
                   auth_url=auth_url, auth_path=auth_path, token_path=token_path,
-                  response_type=response_type)
+                  response_type=response_type, redirect_uri=redirect_uri)
     json = t.get(path=api_path, latitude=41.884441, longitude=-87.628503)
 
     print json
