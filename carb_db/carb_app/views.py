@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 from rest_framework import viewsets, permissions
 
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 
 from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
 from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer
@@ -16,8 +16,8 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
     serializer_class = LyftTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('uuid', 'owner')
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username', 'email')
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
