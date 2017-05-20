@@ -20,6 +20,7 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
     def get_queryset(self):
         user = self.request.user
+        print user
         if user == 'carbAdmin':
             return LyftToken.objects.all()
         else:
@@ -33,6 +34,7 @@ class UberTokenViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
     def get_queryset(self):
         user = self.request.user
+        print user
         if user == 'carbAdmin':
             return UberToken.objects.all()
         else:
