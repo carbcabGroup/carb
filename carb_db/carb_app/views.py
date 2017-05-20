@@ -58,7 +58,7 @@ class UberStatsViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsOwner)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
     def get_queryset(self):
         user = str(self.request.user)
         if user != 'carbAdmin':
