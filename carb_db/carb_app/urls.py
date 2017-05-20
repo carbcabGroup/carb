@@ -1,4 +1,4 @@
-from carb_app.views import LyftTokenViewSet, UberTokenViewSet, LyftStatsViewSet, UberStatsViewSet, UserViewSet, api_root
+from carb_app.views import LyftTokenViewSet, UberTokenViewSet, LyftStatsViewSet, UberStatsViewSet, UserViewSet, UserCreateViewSet, api_root
 from rest_framework import renderers
 
 lyfttoken_list = LyftTokenViewSet.as_view({
@@ -46,10 +46,16 @@ uberstats_detail = UberStatsViewSet.as_view({
 })
 
 user_list = UserViewSet.as_view({
+    'post': 'create',
     'get': 'list'
 })
 user_detail = UserViewSet.as_view({
     'get': 'retrieve'
+})
+
+user_register = UserCreateViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
 })
 
 urlpatterns = format_suffix_patterns([
@@ -63,5 +69,6 @@ urlpatterns = format_suffix_patterns([
     url(r'^uber_stats/$', uberstats_list, name='uberstats_list'),
     url(r'^uber_stats/(?P<pk>[0-9]+)/$', uberstats_detail, name='uberstats_detail'),
     url(r'^users/$', user_list, name='user-list'),
-    url(r'^users/(?P<pk>[0-9]+)/$', user_detail, name='user-detail')
+    url(r'^users/(?P<pk>[0-9]+)/$', user_detail, name='user-detail'),
+    url(r'^register/$', user_register, name='user-register'),
 ])
