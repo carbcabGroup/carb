@@ -10,7 +10,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
 from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer
-from carb_app.permissions import IsOwner
+#from carb_app.permissions import IsOwner
 
 class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
