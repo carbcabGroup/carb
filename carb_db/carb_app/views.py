@@ -10,14 +10,14 @@ from rest_framework import filters
 
 from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
 from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer
-#from carb_app.permissions import IsOwner
+from carb_app.permissions import IsOwner
 
 class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
     serializer_class = LyftTokenSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
-    filter_backends = [filters.SearchFilter,]
-    search_fields = ['auth_uuid', ]
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsOwner)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('auth_uuid',)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
     # def get_queryset(self, *args, **kwargs):
@@ -32,7 +32,7 @@ class UberTokenViewSet(viewsets.ModelViewSet):
     serializer_class = UberTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('auth_uuid', 'owner',)
+    search_fields = ('auth_uuid',)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
