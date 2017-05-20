@@ -20,12 +20,12 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
     search_fields = ('auth_uuid',)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-    # def get_queryset(self, *args, **kwargs):
-    #     queryset_list = LyftToken.objects.all()
-    #     query = self.request.GET.get("q")
-    #     if query:
-    #         queryset_list = queryset_list.filter(Q(auth_uuid__icontains=query)).distinct()
-    #     return queryset_list
+    def get_queryset(self):
+        user = str(self.request.user)
+        if user != 'carbAdmin':
+            return LyftToken.objects.filter(owner=self.request.user)
+        return LyftToken.objects.filter()
+        
 
 class UberTokenViewSet(viewsets.ModelViewSet):
     queryset = UberToken.objects.all()
@@ -35,6 +35,11 @@ class UberTokenViewSet(viewsets.ModelViewSet):
     search_fields = ('auth_uuid',)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+    def get_queryset(self):
+        user = str(self.request.user)
+        if user != 'carbAdmin':
+            return UberToken.objects.filter(owner=self.request.user)
+        return UberToken.objects.filter()
 
 class LyftStatsViewSet(viewsets.ModelViewSet):
     queryset = LyftStats.objects.all()
