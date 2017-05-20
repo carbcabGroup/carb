@@ -30,7 +30,7 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
 class UberTokenViewSet(viewsets.ModelViewSet):
     queryset = UberToken.objects.all()
     serializer_class = UberTokenSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsOwner)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('auth_uuid',)
     def perform_create(self, serializer):
@@ -44,20 +44,25 @@ class UberTokenViewSet(viewsets.ModelViewSet):
 class LyftStatsViewSet(viewsets.ModelViewSet):
     queryset = LyftStats.objects.all()
     serializer_class = LyftStatsSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsOwner)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 class UberStatsViewSet(viewsets.ModelViewSet):
     queryset = UberStats.objects.all()
     serializer_class = UberStatsSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsOwner)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsOwner)
+    def get_queryset(self):
+        user = str(self.request.user)
+        if user != 'carbAdmin':
+            return User.objects.filter(username=self.request.user)
+        return User.objects.filter()
 
 # Create your views here.
