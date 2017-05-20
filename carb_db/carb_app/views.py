@@ -17,7 +17,7 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
     serializer_class = LyftTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('auth_uuid', 'owner')
+    search_fields = ('auth_uuid', 'owner',)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -26,7 +26,7 @@ class UberTokenViewSet(viewsets.ModelViewSet):
     serializer_class = UberTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('auth_uuid', 'owner')
+    search_fields = ('auth_uuid', 'owner',)
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
