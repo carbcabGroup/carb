@@ -16,7 +16,7 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
     serializer_class = LyftTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
-    filter_backends = [filters.SearchFilter,
+    filter_backends = [filters.SearchFilter,]
     search_fields = ['auth_uuid', ]
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
