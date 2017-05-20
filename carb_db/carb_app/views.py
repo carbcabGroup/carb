@@ -10,7 +10,7 @@ from rest_framework import filters
 
 from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
 from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer
-from carb_app.permissions import IsOwner
+from carb_app.permissions import IsOwner, IsUser
 
 class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
@@ -25,7 +25,6 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
         if user != 'carbAdmin':
             return LyftToken.objects.filter(owner=self.request.user)
         return LyftToken.objects.filter()
-        
 
 class UberTokenViewSet(viewsets.ModelViewSet):
     queryset = UberToken.objects.all()
@@ -58,7 +57,7 @@ class UberStatsViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsUser)
     def get_queryset(self):
         user = str(self.request.user)
         if user != 'carbAdmin':
