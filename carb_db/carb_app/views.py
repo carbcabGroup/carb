@@ -21,8 +21,9 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user == 'carbAdmin':
-            return
-        return LyftToken.objects.filter(owner=user)
+            return LyftToken.objects.all()
+        else:
+            return LyftToken.objects.filter(owner=user)
 
 class UberTokenViewSet(viewsets.ModelViewSet):
     queryset = UberToken.objects.all()
@@ -33,8 +34,9 @@ class UberTokenViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user == 'carbAdmin':
-            return
-        return UberToken.objects.filter(owner=user)
+            return UberToken.objects.all()
+        else:
+            return UberToken.objects.filter(owner=user)
 
 class LyftStatsViewSet(viewsets.ModelViewSet):
     queryset = LyftStats.objects.all()
