@@ -25,7 +25,7 @@ SECRET_KEY = 'ssdpouh0zwzoyaag6uq-ze#d^$&6eyz*a0g*#aj-wm1gzvr)0$'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["52.15.168.69", "192.168.1.67"]
+ALLOWED_HOSTS = ["52.15.168.69", "192.168.1.67", "127.0.0.1"]
 
 
 # Application definition
@@ -55,6 +55,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
     ],
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'PAGE_SIZE': 100
 }
 
