@@ -16,19 +16,21 @@ class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()
     serializer_class = LyftTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
-    filter_backends = (filters.SearchFilter,)
-    filter_fields = ('auth_uuid', 'owner')
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+    def get_queryset(self):
+        user = self.request.user
+        return LyftToken.objects.filter(owner=user)
 
 class UberTokenViewSet(viewsets.ModelViewSet):
     queryset = UberToken.objects.all()
     serializer_class = UberTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('auth_uuid', 'owner')
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+    def get_queryset(self):
+        user = self.request.user
+        return UberToken.objects.filter(owner=user)
 
 class LyftStatsViewSet(viewsets.ModelViewSet):
     queryset = LyftStats.objects.all()
