@@ -13,19 +13,19 @@ from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenS
 #from carb_app.permissions import IsOwner
 
 class LyftTokenViewSet(viewsets.ModelViewSet):
-    #queryset = LyftToken.objects.all()
+    queryset = LyftToken.objects.all()
     serializer_class = LyftTokenSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
-    #filter_backends = [filters.SearchFilter,]
-    #search_fields = ['auth_uuid', 'owner',]
+    filter_backends = [filters.SearchFilter,
+    search_fields = ['auth_uuid', ]
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-    def get_queryset(self, *args, **kwargs):
-        queryset_list = LyftToken.objects.all()
-        query = self.request.GET.get("q")
-        if query:
-            queryset_list = queryset_list.filter(Q(auth_uuid__icontains=query)).distinct()
-        return queryset_list
+    # def get_queryset(self, *args, **kwargs):
+    #     queryset_list = LyftToken.objects.all()
+    #     query = self.request.GET.get("q")
+    #     if query:
+    #         queryset_list = queryset_list.filter(Q(auth_uuid__icontains=query)).distinct()
+    #     return queryset_list
 
 class UberTokenViewSet(viewsets.ModelViewSet):
     queryset = UberToken.objects.all()
