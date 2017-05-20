@@ -47,6 +47,6 @@ class UberStatsViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (permissions.IsAdminUser,IsOwner)
+    permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser)
 
 # Create your views here.
