@@ -1,9 +1,9 @@
 import urllib
 import requests
 #import collections
-import uuid
+#import uuid
+import time, datetime
 import webbrowser, os, sys, subprocess
-import django
 
 # simple request only needs additional server token
 class reqSimple:
@@ -30,44 +30,73 @@ class reqSimple:
             return r
 
 class reqOAuth2:
-    def __init__(self, **kwargs):
+    def __init__(self, user_id, **kwargs):
+        self.user_id = user_id
         self.params = kwargs
 
-    # either:
-    #   a) try provided token (may need refresh),
-    #   b) try provided user (check db, may need refresh),
-    #   c) no token
+    # try provided user:
+    #   a) check db for existing (possibly expired) tokens
+    #   b) refresh or get authorization to get new token
     def get(self, path="", **kwargs):
-        # a)
-        if "access_token" in self.params.keys():
-            return getOAuth2CallAPI(self.params['access_token'], path, **kwargs)
+        db_addr = "http://52.15.168.69:8088/"
 
-        # b)
+        # a) check if user auth exists
+        # find user details
+        db_path = "users/"
+        url = db_addr + db_path
+        params = {'search': self.user_id}
+        r = requests.get(url=url, params=params,
+                         auth=('carbAdmin', 'squirthurt66'))
+        tokendata_id = r.json()['results']['id']
+        # follow details to auth info
+        t_data = getTokenData(tokendata_id)
+        # check if auth up to date
+        t_exp = t_data['access_token_exp']
+        if t_exp: # token exists?
+            if datetime.datetime.now() < \
+               dbstrToDatetime(t_exp): # fresh?
+                return getOAuth2CallAPI(t_data['access_token'], path, **kwargs)
+            else: # refresh
+                # undocumented but should return same as new token
+                t_issue = datetime.datetime.now()
+                r = getOAuth2RefreshToken(t_data['refresh_token'])
+                print r.json()
+                saveOAuth2Token(tokendata_id, r.json(), t_issue)
 
-        # c)
-        # 1) auth via system default browser
-        state = str(uuid.uuid4())
-        self.getOAuth2Auth(state) # redirect to uber auth
-        # uber redirects to auth.uber.com (302) and then
-        # login.uber.com (200) to present user with login first
-        # eventually directs to redirect with state/code
+                # call API
+                access_token = r.json()['access_token']
+                return getOAuth2CallAPI(access_token, path, **kwargs)
+        else: #
+            # 1) auth via system default browser
+            state = t_data['auth_uuid']
+            t_start = datetime.datetime.now() # ensure new to ignore previous
+            self.getOAuth2Auth(state) # redirect to uber auth
+            # uber redirects to auth.uber.com (302) and then
+            # login.uber.com (200) to present user with login first,
+            # eventually directs to preset redirect with state/code;
+            # webserver listening at redirect saves code in db
 
-        #print r.status_code
-        #print (repr(r.headers))[:1023]
-        #print (repr(r.text))[:1023]
-        #print r.history
-        #print r.url
+            #print r.status_code
+            #print (repr(r.headers))[:1023]
+            #print (repr(r.text))[:1023]
+            #print r.history
+            #print r.url
 
-        # 2) receive code from webserver via database
-        auth_code = getOAuth2ReceiveCode(self, state)
+            # 2) receive code from webserver via database
+            auth_code = getOAuth2ReceiveCode(tokendata_id, t_start)
 
-        # 3) exchange for token
-        r = getOAuth2GetToken(self, auth_code)
-        print r.json()
+            if auth_code:
+                # 3) exchange for token
+                # actually coming few moments from now,
+                # so token will expire slightly early
+                t_issue = datetime.datetime.now()
+                r = getOAuth2GetToken(auth_code)
+                print r.json()
+                saveOAuth2Token(tokendata_id, r.json(), t_issue)
 
-        # 4) call API
-        access_token = r.json()['access_token']
-        getOAuth2CallAPI(access_token, path, **kwargs)
+                # 4) call API
+                access_token = r.json()['access_token']
+                return getOAuth2CallAPI(access_token, path, **kwargs)
 
     def getSimple(self, url, path="", headers={}, **kwargs):
         if len(path) != 0:
@@ -84,6 +113,19 @@ class reqOAuth2:
             print kwargs
             print (repr(r.text))[:1023]
             return r
+
+    def getTokenData(self, tokendata_id):
+        db_addr = "http://52.15.168.69:8088/"
+        db_path = "uber_tokens/" + str(tokendata_id) + '/'
+        url = db_addr + db_path
+        r = requests.get(url=url,
+                         auth=('carbAdmin', 'squirthurt66'))
+        return r.json()
+
+    def dbstrToDatetime(self, db_string):
+        # e.g.: "2017-05-20T00:03:35.273808Z"
+        t_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+        return datetime.datetime.strptime(db_string, t_format)
 
     # params: client_id, response_type (code)
     # opt params: scope, state, redirect_uri
@@ -108,12 +150,43 @@ class reqOAuth2:
                 except OSError:
                     print 'Please open a browser on: ' + url
 
-    def getOAuth2ReceiveCode(self, state):
-        return
+    def getOAuth2ReceiveCode(self, tokendata_id, t_start):
+        wait_count = 5
+        wait_time = 10
+        while wait_count > 0:
+            t_data = getTokenData(tokendata_id)
+            auth_code = t_data['auth_code']
+            t_updated = dbstrToDatetime(t_data['updated'])
+            if auth_code == "" or t_updated < t_start:
+                time.sleep(wait_time)
+                wait_count -= 1
+                wait_time *= 2
+            else:
+                break
+        if auth_code == "" or t_updated < t_start: # timed out
+            return None
+        return auth_code
 
     def getOAuth2GetToken(self, auth_code):
         headers = {}
         return getSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='authorization_code', redirect_uri=self.params['redirect_uri'], code=auth_code)
+
+    def getOAuth2RefreshToken(self, token):
+        headers = {}
+        return getSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='refresh_token', refresh_token=token)
+
+    def saveOAuth2Token(self, tokendata_id, token_info, t_issue):
+        db_addr = "http://52.15.168.69:8088/"
+        db_path = "uber_tokens/" + str(tokendata_id) + '/'
+        url = db_addr + db_path
+        t_exp = t_issue + datetime.datetime(second=token_info['expires_in'])
+        data = {'access_token': token_info['access_token'],
+                'access_token_exp': t_exp,
+                'refresh_token': token_info['refresh_token'],
+                'auth_scope': token_info['scope']}
+        r = requests.put(url=url, data=data
+                         auth=('carbAdmin', 'squirthurt66'))
+        return r
 
     def getOAuth2CallAPI(self, access_token, path="", **kwargs):
         headers = {'Authorization' : 'Bearer %s' % access_token}
@@ -163,7 +236,7 @@ def main():
     api_url = "https://sandbox-api.uber.com"
     api_path = "/v1.2/products"
 
-    t = reqOAuth2(client_id=client_id,
+    t = reqOAuth2(user_id="sptest", client_id=client_id,
                   client_secret=client_secret, server_token=server_token,
                   auth_url=auth_url, auth_path=auth_path, token_path=token_path,
                   response_type=response_type, redirect_uri=redirect_uri)
