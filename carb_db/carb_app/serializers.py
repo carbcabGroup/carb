@@ -33,12 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
     uber_token = serializers.PrimaryKeyRelatedField(many=True, queryset=UberToken.objects.all())
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password', 'lyft_token', 'uber_token')
-        write_only_fields = ('password')
-        read_only_fields = ('is_staff', 'is_superuser', 'is_active', 'date_joined',)
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+        fields = ('id', 'username', 'lyft_token', 'uber_token')
 
 class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:

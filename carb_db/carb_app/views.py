@@ -58,6 +58,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (permissions.IsAuthenticated,permissions.IsAdminUser,IsUser)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
     def get_queryset(self):
         user = str(self.request.user)
         if user != 'carbAdmin':
@@ -72,5 +74,3 @@ class UserCreateViewSet(viewsets.ModelViewSet):
         if user != 'carbAdmin':
             return User.objects.filter(username=self.request.user)
         return User.objects.filter()
-
-# Create your views here.

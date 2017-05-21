@@ -24,7 +24,7 @@ router.register(r'lyft_tokens', views.LyftTokenViewSet)
 router.register(r'uber_tokens', views.UberTokenViewSet)
 router.register(r'lyft_stats', views.LyftStatsViewSet)
 router.register(r'uber_stats', views.UberStatsViewSet)
-router.register(r'users', views.UserViewSet)
+router.register(r'users', views.UserViewSet, 'users')
 router.register(r'register', views.UserCreateViewSet)
 
 urlpatterns = [
