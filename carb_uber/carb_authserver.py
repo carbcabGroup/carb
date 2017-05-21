@@ -1,7 +1,6 @@
 import BaseHTTPServer
 import ssl
-
-import sys, os#, django
+import requests
 
 class HTTPAuthCodeHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -20,9 +19,24 @@ class HTTPAuthCodeHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 print "Querying/updating with:"
                 print pdict
                 try:
-                    t = UberToken.objects.get(auth_uuid=pdict['state'])
-                    t.auth_code = pdict['code']
-                    t.save()
+                    url = "http://52.15.168.69:8088/uber_tokens/"
+                    headers = {}
+                    params = {'search': pdict['state'].replace('-', '')}
+                    r = requests.get(url=url, headers=headers, params=params,
+                                     auth=('carbAdmin', 'squirthurt66'))
+                    print "Retrieved query:"
+                    print r.json()
+                    user_row = r.json()['results'][0]
+                    print "User access details:"
+                    print user_row
+
+                    url = url + str(user_row[u'id']) + '/'
+                    print "Updating " + url + " ..."
+                    data = {'auth_code': pdict['code']}
+                    r = requests.put(url=url, headers=headers, data=data,
+                                     auth=('carbAdmin', 'squirthurt66'))
+                    print "PUT request status:"
+                    print r.status_code
                     msg = "Authorization recorded."
                 except:
                     msg = "Authorization couldn't be saved (database error)."
@@ -42,16 +56,6 @@ class HTTPAuthCodeHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     print "Response buffer write error"
 
 if __name__ == '__main__':
-    # package-indifferent import
-    if __package__ is None:
-        from os import path
-        sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-    from carb_db.carb_app.models import UberToken
-
-    # db access init
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'carb_db.settings'
-    django.setup()
-
     # run server
     server_address = ("127.0.0.1", 8000)
     print "Starting server at " + server_address[0] + ":" + str(server_address[1])
