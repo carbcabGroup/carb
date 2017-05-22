@@ -30,73 +30,92 @@ class reqSimple:
             return r
 
 class reqOAuth2:
-    def __init__(self, user_id, **kwargs):
+    def __init__(self, user_id, user_auth, **kwargs):
         self.user_id = user_id
+        self.user_auth = user_auth
         self.params = kwargs
 
     # try provided user:
     #   a) check db for existing (possibly expired) tokens
     #   b) refresh or get authorization to get new token
     def get(self, path="", **kwargs):
-        db_addr = "http://52.15.168.69:8088/"
-
-        # a) check if user auth exists
         # find user details
-        db_path = "users/"
-        url = db_addr + db_path
-        params = {'search': self.user_id}
-        r = requests.get(url=url, params=params,
-                         auth=('carbAdmin', 'squirthurt66'))
-        tokendata_id = r.json()['results']['id']
+        print "Searching for user \"" + self.user_id + "\""
+        userdata = self.getUserInfo()
+        print "User details:"
+        print userdata
+
+        # examine uber tokens
+        tokendata = userdata['uber_token']
+        print "Current tokens:"
+        print tokendata
+        if len(tokendata) == 0: # initialize/refresh if empty
+            print "Creating blank token"
+            self.makeEmptyToken()
+            userdata = self.getUserInfo()
+            tokendata = userdata['uber_token']
+        print "Using tokens:"
+        print tokendata
+        # token exists
+        tokendata_id = tokendata[0]
         # follow details to auth info
-        t_data = getTokenData(tokendata_id)
+        t_data = self.getTokenData(tokendata_id)
+        print "Selected token:"
+        print t_data
         # check if auth up to date
         t_exp = t_data['access_token_exp']
-        if t_exp: # token exists?
-            if datetime.datetime.now() < \
-               dbstrToDatetime(t_exp): # fresh?
-                return getOAuth2CallAPI(t_data['access_token'], path, **kwargs)
+        if t_exp is not None: # contains actual token data
+            if datetime.datetime.now() < self.dbstrToDatetime(t_exp): # fresh?
+                print "Using valid token"
+                return self.callAPI(t_data['access_token'], path, **kwargs)
             else: # refresh
                 # undocumented but should return same as new token
+                print "Refreshing token"
                 t_issue = datetime.datetime.now()
-                r = getOAuth2RefreshToken(t_data['refresh_token'])
-                print r.json()
-                saveOAuth2Token(tokendata_id, r.json(), t_issue)
+                r = self.refreshToken(t_data['refresh_token'])
+                print r
+                self.saveToken(tokendata_id, r, t_issue)
 
                 # call API
-                access_token = r.json()['access_token']
-                return getOAuth2CallAPI(access_token, path, **kwargs)
-        else: #
-            # 1) auth via system default browser
-            state = t_data['auth_uuid']
-            t_start = datetime.datetime.now() # ensure new to ignore previous
-            self.getOAuth2Auth(state) # redirect to uber auth
-            # uber redirects to auth.uber.com (302) and then
-            # login.uber.com (200) to present user with login first,
-            # eventually directs to preset redirect with state/code;
-            # webserver listening at redirect saves code in db
+                print "Using valid token"
+                access_token = r['access_token']
+                return self.callAPI(access_token, path, **kwargs)
+        #  no valid tokens
+        # 1) auth via system default browser
+        print "Redirecting user to authorization..."
+        state = t_data['auth_uuid']
+        t_start = datetime.datetime.now() # ensure new to ignore previous
+        self.getUserAuth(state) # redirect to uber auth
+        # uber redirects to auth.uber.com (302) and then
+        # login.uber.com (200) to present user with login first,
+        # eventually directs to preset redirect with state/code;
+        # webserver listening at redirect saves code in db
 
-            #print r.status_code
-            #print (repr(r.headers))[:1023]
-            #print (repr(r.text))[:1023]
-            #print r.history
-            #print r.url
+        #print r.status_code
+        #print (repr(r.headers))[:1023]
+        #print (repr(r.text))[:1023]
+        #print r.history
+        #print r.url
 
-            # 2) receive code from webserver via database
-            auth_code = getOAuth2ReceiveCode(tokendata_id, t_start)
+        # 2) receive code from webserver via database
+        print "Waiting for user authorization..."
+        auth_code = self.receiveAuthCode(tokendata_id, t_start)
 
-            if auth_code:
-                # 3) exchange for token
-                # actually coming few moments from now,
-                # so token will expire slightly early
-                t_issue = datetime.datetime.now()
-                r = getOAuth2GetToken(auth_code)
-                print r.json()
-                saveOAuth2Token(tokendata_id, r.json(), t_issue)
+        print "Received authorization:"
+        print auth_code
+        if auth_code is not None:
+            # 3) exchange for token
+            # actually coming few moments from now,
+            # so token will expire slightly early
+            t_issue = datetime.datetime.now()
+            r = self.getToken(auth_code)
+            print r
+            self.saveToken(tokendata_id, r, t_issue)
 
-                # 4) call API
-                access_token = r.json()['access_token']
-                return getOAuth2CallAPI(access_token, path, **kwargs)
+            # 4) call API
+            access_token = r['access_token']
+            return self.callAPI(access_token, path, **kwargs)
+        return None
 
     def getSimple(self, url, path="", headers={}, **kwargs):
         if len(path) != 0:
@@ -114,12 +133,43 @@ class reqOAuth2:
             print (repr(r.text))[:1023]
             return r
 
+    def postSimple(self, url, path="", headers={}, **kwargs):
+        if len(path) != 0:
+            if path[0] != '/':
+                path = '/' + path
+            url = url + path
+        r = requests.post(url, headers=headers, data=kwargs)
+        # note: cleanly handled invalid requests will still succeed
+        try:
+            return r.json()
+        except:
+            print url
+            print headers
+            print kwargs
+            print (repr(r.text))[:1023]
+            return r
+
+    def getUserInfo(self):
+        db_addr = "http://52.15.168.69:8088/"
+        db_path = "users/"
+        url = db_addr + db_path
+        params = {'search': self.user_id}
+        r = requests.get(url=url, params=params,
+                         auth=(self.user_id, self.user_auth))
+        return r.json()['results'][0]
+
+    def makeEmptyToken(self):
+        db_addr = "http://52.15.168.69:8088/"
+        db_path = "uber_tokens/"
+        url = db_addr + db_path
+        return requests.post(url, auth=(self.user_id, self.user_auth))
+
     def getTokenData(self, tokendata_id):
         db_addr = "http://52.15.168.69:8088/"
         db_path = "uber_tokens/" + str(tokendata_id) + '/'
         url = db_addr + db_path
         r = requests.get(url=url,
-                         auth=('carbAdmin', 'squirthurt66'))
+                         auth=(self.user_id, self.user_auth))
         return r.json()
 
     def dbstrToDatetime(self, db_string):
@@ -129,7 +179,7 @@ class reqOAuth2:
 
     # params: client_id, response_type (code)
     # opt params: scope, state, redirect_uri
-    def getOAuth2Auth(self, state):
+    def getUserAuth(self, state):
         query_string = urllib.urlencode({'response_type': self.params['response_type'],
                                          'client_id': self.params['client_id'],
                                          'state': state,
@@ -150,47 +200,46 @@ class reqOAuth2:
                 except OSError:
                     print 'Please open a browser on: ' + url
 
-    def getOAuth2ReceiveCode(self, tokendata_id, t_start):
+    def receiveAuthCode(self, tokendata_id, t_start):
         wait_count = 5
         wait_time = 10
         while wait_count > 0:
-            t_data = getTokenData(tokendata_id)
+            t_data = self.getTokenData(tokendata_id)
             auth_code = t_data['auth_code']
-            t_updated = dbstrToDatetime(t_data['updated'])
+            t_updated = self.dbstrToDatetime(t_data['updated'])
             if auth_code == "" or t_updated < t_start:
                 time.sleep(wait_time)
                 wait_count -= 1
                 wait_time *= 2
-            else:
-                break
-        if auth_code == "" or t_updated < t_start: # timed out
-            return None
-        return auth_code
+                print "No response, waiting " + str(wait_time) + "s before retrying"
+            else: # some kind of code was recently added
+                return auth_code
+        return None # timed out
 
-    def getOAuth2GetToken(self, auth_code):
+    def getToken(self, auth_code):
         headers = {}
-        return getSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='authorization_code', redirect_uri=self.params['redirect_uri'], code=auth_code)
+        return self.postSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='authorization_code', redirect_uri=self.params['redirect_uri'], code=auth_code)
 
-    def getOAuth2RefreshToken(self, token):
+    def refreshToken(self, token):
         headers = {}
-        return getSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='refresh_token', refresh_token=token)
+        return self.postSimple(self.params['auth_url'], path=self.params['token_path'], headers=headers, client_secret=self.params['client_secret'], client_id=self.params['client_id'], grant_type='refresh_token', refresh_token=token)
 
-    def saveOAuth2Token(self, tokendata_id, token_info, t_issue):
+    def saveToken(self, tokendata_id, token_info, t_issue):
         db_addr = "http://52.15.168.69:8088/"
         db_path = "uber_tokens/" + str(tokendata_id) + '/'
         url = db_addr + db_path
-        t_exp = t_issue + datetime.datetime(second=token_info['expires_in'])
+        t_exp = t_issue + datetime.timedelta(seconds=token_info['expires_in'])
         data = {'access_token': token_info['access_token'],
                 'access_token_exp': t_exp,
                 'refresh_token': token_info['refresh_token'],
                 'auth_scope': token_info['scope']}
-        r = requests.put(url=url, data=data
-                         auth=('carbAdmin', 'squirthurt66'))
+        r = requests.put(url=url, data=data,
+                         auth=(self.user_id, self.user_auth))
         return r
 
-    def getOAuth2CallAPI(self, access_token, path="", **kwargs):
+    def callAPI(self, access_token, path="", **kwargs):
         headers = {'Authorization' : 'Bearer %s' % access_token}
-        return getSimple(self.api_url, path=path, headers=headers, **kwargs)
+        return self.getSimple(self.params['api_url'], path=path, headers=headers, **kwargs)
 
 def printDiv():
     print
@@ -226,7 +275,9 @@ def main():
     #         print
 
     # OAuth2 (client-provider-server)
-    # 1) auth
+    user_id = "sptest"
+    user_auth = "spsp"
+
     auth_url = "https://login.uber.com"
     auth_path = "/oauth/v2/authorize"
     token_path = "/oauth/v2/token"
@@ -236,7 +287,7 @@ def main():
     api_url = "https://sandbox-api.uber.com"
     api_path = "/v1.2/products"
 
-    t = reqOAuth2(user_id="sptest", client_id=client_id,
+    t = reqOAuth2(user_id, user_auth, api_url=api_url, client_id=client_id,
                   client_secret=client_secret, server_token=server_token,
                   auth_url=auth_url, auth_path=auth_path, token_path=token_path,
                   response_type=response_type, redirect_uri=redirect_uri)
