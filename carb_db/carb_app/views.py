@@ -69,6 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class UserCreateViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserCreateSerializer
+    permission_classes = (permissions.AllowAny,)
     def get_queryset(self):
         user = str(self.request.user)
         if user != 'carbAdmin':
