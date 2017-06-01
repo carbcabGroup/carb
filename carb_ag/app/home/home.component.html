@@ -4,7 +4,9 @@
     <div>
         Users from secure api end point:
         <ul>
-            <li *ngFor="let user of users">{{user.firstName}} {{user.lastName}}</li>
+            <div *ngIf="users != 0">
+                <li *ngFor="let user of users">{{user}}</li>
+            </div>
         </ul>
     </div>
     <p><a [routerLink]="['/login']">Logout</a></p>

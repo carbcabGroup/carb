@@ -14,7 +14,7 @@ export class HomeComponent implements OnInit {
     constructor(private userService: UserService) { }
 
     ngOnInit() {
-        // get users from secure api end point
+        console.log("home")
         this.userService.getUsers()
             .subscribe(users => {
                 this.users = users;
