@@ -24,8 +24,8 @@ from rest_framework_jwt.views import refresh_jwt_token
 from carb_app import views
 
 router = routers.DefaultRouter()
-router.register(r'lyft_tokens', views.LyftTokenViewSet)
-router.register(r'uber_tokens', views.UberTokenViewSet)
+router.register(r'lyft_token', views.LyftTokenViewSet)
+router.register(r'uber_token', views.UberTokenViewSet)
 router.register(r'lyft_stats', views.LyftStatsViewSet)
 router.register(r'uber_stats', views.UberStatsViewSet)
 router.register(r'users', views.UserViewSet, 'users')
