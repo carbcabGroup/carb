@@ -11,7 +11,8 @@ import { AppComponent }  from './app.component';
 import { routing }        from './app.routing';
 
 import { AuthGuard } from './_guards/index';
-import { AuthenticationService, UserService } from './_services/index';
+//import { AuthenticationService, UserService } from './_services/index';
+import { AuthenticationService, UserTokenService } from './_services/index';
 import { LoginComponent } from './login/index';
 import { HomeComponent } from './home/index';
 
@@ -30,7 +31,8 @@ import { HomeComponent } from './home/index';
     providers: [
         AuthGuard,
         AuthenticationService,
-        UserService,
+        //UserService,
+        UserTokenService,
 
         // providers used to create fake backend
         BaseRequestOptions

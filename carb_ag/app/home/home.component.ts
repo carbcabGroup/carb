@@ -1,7 +1,8 @@
 ﻿import { Component, OnInit } from '@angular/core';
 
 import { User } from '../_models/index';
-import { UserService } from '../_services/index';
+import { UserTokenData } from '../_models/index';
+import { UserTokenService } from '../_services/index';
 
 @Component({
     moduleId: module.id,
@@ -9,15 +10,15 @@ import { UserService } from '../_services/index';
 })
 
 export class HomeComponent implements OnInit {
-    users: User[] = [];
+    userTokens: User[] = [];
 
-    constructor(private userService: UserService) { }
+    constructor(private userTokenService: UserTokenService) { }
 
     ngOnInit() {
-        console.log("I'm at home")
-        this.userService.getUsers()
-            .subscribe(users => {
-                this.users = users;
+        console.log("At user home:");
+        this.userTokenService.getUserTokens()
+            .subscribe(userTokens => {
+                this.userTokens = userTokens;
             });
     }
 

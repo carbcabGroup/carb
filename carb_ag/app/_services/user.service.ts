@@ -19,7 +19,13 @@ export class UserService {
         let options = new RequestOptions({ headers: headers });
 
         // get users from api
+        console.log('Getting user details...');
         return this.http.get('http://52.15.168.69:8088/lyft_tokens/', options)
-            .map((response: Response) => response.json());
+            .map((response: Response) => {
+                let lyfttoken = response.json();
+                console.log('Retrieved user details:');
+                console.log(response.json());
+                return [];
+            });
     }
 }
