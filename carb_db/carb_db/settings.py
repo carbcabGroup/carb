@@ -29,6 +29,26 @@ DEBUG = True
 ALLOWED_HOSTS = ["52.15.168.69", "192.168.1.67", "127.0.0.1"]
 
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3030',
+    '52.15.168.69:3000',
+    '52.15.168.69:8088',
+    '192.168.1.67:3000',
+    '192.168.1.67:8088',
+    '127.0.0.1:3000',
+    '127.0.0.1:8088',
+)
+CORS_ORIGIN_REGEX_WHITELIST = (
+    'localhost:3030',
+    '52.15.168.69:3000',
+    '52.15.168.69:8088',
+    '192.168.1.67:3000',
+    '192.168.1.67:8088',
+    '127.0.0.1:3000',
+    '127.0.0.1:8088',
+)
 
 # Application definition
 
