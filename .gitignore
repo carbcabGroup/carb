@@ -1,6 +1,16 @@
+# Environment data
 .git/
-carb.pem
+*.pem
+*.csr
+*.key
+*.cert
 carb_venv/
 carb_db/db.sqlite3
 carb_db/carb_app/migrations/
-*.pyc 
+
+# Python extensions
+*.py[cod]
+
+# Emacs garbage
+*~
+\#*#
