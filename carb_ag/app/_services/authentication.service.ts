@@ -25,7 +25,8 @@ export class AuthenticationService {
             .map((response: Response) => {
                 // login successful if there's a jwt token in the response
                 let token = response.json() && response.json().token;
-                console.log(token)
+                console.log('Retrieved carb token:');
+                console.log(token);
                 if (token) {
                     // set token property
                     this.token = token;
@@ -33,7 +34,8 @@ export class AuthenticationService {
                     // store username and jwt token in local storage to keep user logged in between page refreshes
                     localStorage.setItem('currentUser', JSON.stringify({ username: username, token: token }));
                     //localStorage.setItem('id_token', token);
-                    console.log(localStorage)
+                    console.log('Saved access for current session:');
+                    console.log(localStorage);
 
                     // return true to indicate successful login
                     return true;
