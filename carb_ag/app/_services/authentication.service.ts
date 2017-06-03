@@ -14,6 +14,9 @@ export class AuthenticationService {
     }
 
     login(username: string, password: string): Observable<boolean> {
+        let urlbase = 'http://52.15.168.69:8088';
+        let path = '/api-token-auth/';
+        let url = urlbase + path;
         let headers = new Headers({
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -21,7 +24,7 @@ export class AuthenticationService {
         let options = new RequestOptions({
             headers: headers
         });
-        return this.http.post('http://52.15.168.69:8088/api-token-auth/', JSON.stringify({ username: username, password: password }), options)
+        return this.http.post(url, JSON.stringify({ username: username, password: password }), options)
             .map((response: Response) => {
                 // login successful if there's a jwt token in the response
                 let token = response.json() && response.json().token;
