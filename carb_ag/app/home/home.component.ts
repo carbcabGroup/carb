@@ -1,7 +1,8 @@
 ﻿import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/expand'
+import 'rxjs/add/operator/map'
 import 'rxjs/add/observable/from'
+import 'rxjs/add/operator/mergeAll'
 
 import { User } from '../_models/index';
 import { UserService } from '../_services/index';
@@ -15,8 +16,9 @@ import { UserTokenService } from '../_services/index';
 
 export class HomeComponent implements OnInit {
     userData: User[] = [];
+    userString: string = "";
     tokenData: UserTokenData[] = [];
-    userTokens: 'Tokens:'; // for the template
+    tokenStrings: string[] = ['Tokens:', 'test', 'sample']; // for the template
 
     constructor(private userService: UserService,
                 private userTokenService: UserTokenService) { }
@@ -28,14 +30,19 @@ export class HomeComponent implements OnInit {
         observedUsers.subscribe(users => {
             // update template
             this.userData = users;
+            this.userString = this.userData[0].username;
         });
         console.log("...done.");
         console.log("Connecting to token API...");
-        let tokenRequesters = observedUsers.expand(users => {
+        let observedRequesters = observedUsers.map(users => {
             return Observable.from(users);
         });
-        let observedTokens = tokenRequesters.flatMap(this.userTokenService.getUserTokens);
-        observedTokens.subscribe(tokens => {
+        let tokenRequesters = observedRequesters.mergeAll();
+        let observedTokens = tokenRequesters.map(user => {
+            return this.userTokenService.getUserTokens(user);
+        });
+        let userTokens = observedTokens.mergeAll();
+        userTokens.subscribe(tokens => {
             this.tokenData = tokens;
         });
         console.log("...done.");

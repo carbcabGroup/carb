@@ -1,9 +1,10 @@
 ﻿import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
+import 'rxjs/add/operator/map'
+import 'rxjs/add/operator/mergeAll'
 import 'rxjs/add/observable/from'
 import 'rxjs/add/observable/of'
 
@@ -25,13 +26,14 @@ export class UserTokenService {
         // get tokens from api
         // ...maybe use a services class to manage
         // a map of service names/API paths
-        console.log('Getting token details for "', user.username, '"...');
+        console.log('Getting token details for "' + user.username + '"...');
         var api_requests: TokenDataRequestParams[] = [
                 <TokenDataRequestParams>({ serviceName: 'lyft', path: '/lyft_token', id: user.lyft_token }),
                 <TokenDataRequestParams>({ serviceName: 'uber', path: '/uber_token', id: user.uber_token }),
         ];
         let tokenRequests = Observable.from(api_requests);
-        let userTokens = tokenRequests.map(this.getUserToken).catch(this.handleError);
+        let observedTokens = tokenRequests.map(this.getUserToken);//.catch(this.handleError);
+        let userTokens = observedTokens.mergeAll();
         console.log('Token info:');
         console.log(userTokens);
         return userTokens;
@@ -39,19 +41,22 @@ export class UserTokenService {
 
     // Get a specific token
     getUserToken(t_params: TokenDataRequestParams): Observable<UserTokenData[]> {
+        console.log('Getting "' + t_params.serviceName + '" details...');
         if (t_params.id.length == 0) {
+            console.log('...no tokens for this service.');
             let userTokens: UserTokenData[] = [];
             return Observable.of(userTokens);
         }
+        console.log('...tokens exist; continuing...');
         // add authorization header with jwt token
         let urlbase = 'http://52.15.168.69:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let options = new RequestOptions({ headers: headers });
 
-        console.log('Getting "' + t_params.serviceName + '" details...');
+        console.log('Retrieving token details...');
         let path = t_params.path + '/' + t_params.id[0];
         let url = urlbase + path;
-        let userTokens = this.http.get(url, options).map(mapTokenResp).catch(this.handleError);
+        let userTokens = this.http.get(url, options).map(mapTokenResp);//.catch(this.handleError);
         return userTokens;
     }
 
