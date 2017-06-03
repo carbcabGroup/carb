@@ -4,8 +4,6 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
 import 'rxjs/add/operator/map'
-import 'rxjs/add/operator/mergeAll'
-import 'rxjs/add/observable/from'
 import 'rxjs/add/observable/of'
 
 import { AuthenticationService } from './index';
@@ -19,24 +17,6 @@ export class UserTokenService {
     constructor(
         private http: Http,
         private authenticationService: AuthenticationService) {
-    }
-
-    // Get all the tokens associated with a user
-    getUserTokens(user: User): Observable<UserTokenData[]> {
-        // get tokens from api
-        // ...maybe use a services class to manage
-        // a map of service names/API paths
-        console.log('Getting token details for "' + user.username + '"...');
-        var api_requests: TokenDataRequestParams[] = [
-                <TokenDataRequestParams>({ serviceName: 'lyft', path: '/lyft_token', id: user.lyft_token }),
-                <TokenDataRequestParams>({ serviceName: 'uber', path: '/uber_token', id: user.uber_token }),
-        ];
-        let tokenRequests = Observable.from(api_requests);
-        let observedTokens = tokenRequests.map(this.getUserToken);//.catch(this.handleError);
-        let userTokens = observedTokens.mergeAll();
-        console.log('Token info:');
-        console.log(userTokens);
-        return userTokens;
     }
 
     // Get a specific token
@@ -56,7 +36,7 @@ export class UserTokenService {
         console.log('Retrieving token details...');
         let path = t_params.path + '/' + t_params.id[0];
         let url = urlbase + path;
-        let userTokens = this.http.get(url, options).map(mapTokenResp);//.catch(this.handleError);
+        let userTokens = this.http.get(url, options).map(mapTokenResp).catch(this.handleError);
         return userTokens;
     }
 

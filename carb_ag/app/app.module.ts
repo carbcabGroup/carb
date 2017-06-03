@@ -12,7 +12,10 @@ import { routing }        from './app.routing';
 
 import { AuthGuard } from './_guards/index';
 //import { AuthenticationService, UserService } from './_services/index';
-import { AuthenticationService, UserService, UserTokenService } from './_services/index';
+import { AuthenticationService,
+         UserService,
+         UserConnectionService,
+         UserTokenService } from './_services/index';
 import { LoginComponent } from './login/index';
 import { HomeComponent } from './home/index';
 

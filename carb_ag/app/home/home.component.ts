@@ -7,7 +7,7 @@ import 'rxjs/add/operator/mergeAll'
 import { User } from '../_models/index';
 import { UserService } from '../_services/index';
 import { UserTokenData } from '../_models/index';
-import { UserTokenService } from '../_services/index';
+import { UserConnectionService } from '../_services/index';
 
 @Component({
     moduleId: module.id,
@@ -21,7 +21,7 @@ export class HomeComponent implements OnInit {
     tokenStrings: string[] = ['Tokens:', 'test', 'sample']; // for the template
 
     constructor(private userService: UserService,
-                private userTokenService: UserTokenService) { }
+                private userConnectionService: UserConnectionService) { }
 
     ngOnInit() {
         console.log("At user home:");
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit {
         });
         let tokenRequesters = observedRequesters.mergeAll();
         let observedTokens = tokenRequesters.map(user => {
-            return this.userTokenService.getUserTokens(user);
+            return this.userConnectionService.getUserTokens(user);
         });
         let userTokens = observedTokens.mergeAll();
         userTokens.subscribe(tokens => {
