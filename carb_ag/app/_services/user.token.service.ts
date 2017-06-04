@@ -7,7 +7,6 @@ import 'rxjs/add/operator/map'
 import 'rxjs/add/observable/of'
 
 import { AuthenticationService } from './index';
-import { User } from '../_models/index';
 import { UserTokenData } from '../_models/index';
 import { TokenDataRequestParams } from '../_models/index';
 

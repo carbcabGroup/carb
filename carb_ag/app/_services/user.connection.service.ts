@@ -18,7 +18,6 @@ import { TokenDataRequestParams } from '../_models/index';
 export class UserConnectionService {
     constructor(
         private http: Http,
-        private authenticationService: AuthenticationService,
         private userTokenService: UserTokenService,) {
     }
 
@@ -33,7 +32,9 @@ export class UserConnectionService {
                 <TokenDataRequestParams>({ serviceName: 'uber', path: '/uber_token', id: user.uber_token }),
         ];
         let tokenRequests = Observable.from(api_requests);
-        let observedTokens = tokenRequests.map(this.userTokenService.getUserToken).catch(this.handleError);
+        let observedTokens = tokenRequests.map(params => {
+            return this.userTokenService.getUserToken(params);
+        }).catch(this.handleError);
         let userTokens = observedTokens.mergeAll();
         console.log('Token info:');
         console.log(userTokens);

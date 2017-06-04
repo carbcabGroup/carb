@@ -36,6 +36,7 @@ import { HomeComponent } from './home/index';
         AuthenticationService,
         UserService,
         UserTokenService,
+        UserConnectionService,
 
         // providers used to create fake backend
         //BaseRequestOptions
