@@ -33,7 +33,7 @@ export class UserTokenService {
         let options = new RequestOptions({ headers: headers });
 
         console.log('Retrieving token details...');
-        let path = t_params.path + '/' + t_params.id[0];
+        let path = t_params.path + '/' + t_params.id[0] + '/';
         let url = urlbase + path;
         let userTokens = this.http.get(url, options).map(mapTokenResp).catch(this.handleError);
         return userTokens;
@@ -49,11 +49,11 @@ export class UserTokenService {
 // Static helpers
 function mapTokenResp(r: Response): UserTokenData[]{
     console.log('Mapping a token API response...');
-    let tokenData = r.json().results.map(toUserTokenData);
+    let tokenData = toUserTokenData(r.json());
     // peel off last field from originator
     // need to regex <stuff><servicepath><id>
     tokenData.serviceName = r.url;
-    return tokenData;
+    return [tokenData];
 }
 
 function toUserTokenData(r: any): UserTokenData{

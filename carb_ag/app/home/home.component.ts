@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit {
     userData: User[] = [];
     userString: string = "";
     tokenData: UserTokenData[] = [];
-    tokenStrings: string[] = ['Tokens:', 'test', 'sample']; // for the template
+    tokenStrings: string[] = []; // for the template
 
     constructor(private userService: UserService,
                 private userConnectionService: UserConnectionService) { }
@@ -44,6 +44,12 @@ export class HomeComponent implements OnInit {
         let userTokens = observedTokens.mergeAll();
         userTokens.subscribe(tokens => {
             this.tokenData = tokens;
+            var i;
+            for (i = 0; i < this.tokenData.length; i++) {
+                let tString = "Service: " + this.tokenData[i].serviceName
+                    + ", Token: " + this.tokenData[i].access_token;
+                this.tokenStrings.push(tString);
+            }
         });
         console.log("...done.");
     }
