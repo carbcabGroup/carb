@@ -7,7 +7,7 @@
 carb_venv/
 carb_db/db.sqlite3
 carb_db/carb_app/migrations/
-#carb_if/myApp/node_modules/
+carb_app/myApp/node_modules/
 
 # Python extensions
 *.py[cod]
