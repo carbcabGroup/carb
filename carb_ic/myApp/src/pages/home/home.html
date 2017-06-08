@@ -9,7 +9,7 @@
 
 <ion-content padding>
 
-<ion-list>
+<!--<ion-list>
 
   <ion-item>
     <ion-label fixed>Username</ion-label>
@@ -21,7 +21,19 @@
     <ion-input type="password"></ion-input>
   </ion-item>
 
-</ion-list>
+</ion-list>-->
 
-  <button ion-button secondary menuToggle>Log In</button>
+<form (ngSubmit)="getToken()">
+  <ion-item>
+      <ion-label for="username">Username</ion-label>
+      <ion-input type="text" name="username" [(ngModel)]="model.username"></ion-input>
+  </ion-item>
+  <ion-item>
+      <ion-label for="password">Password</ion-label>
+      <ion-input type="password" name="password" [(ngModel)]="model.password"></ion-input>
+  </ion-item>
+    <button ion-button type="submit" block>Login</button>
+</form>
+
+  <!--<button ion-button secondary menuToggle>Log In</button>-->
 </ion-content>

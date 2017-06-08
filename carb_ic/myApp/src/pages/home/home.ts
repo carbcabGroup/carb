@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage } from 'ionic-angular';
 import { NavController } from 'ionic-angular';
 import { DTokenProvider } from '../../providers/d-token/d-token';
 
