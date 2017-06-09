@@ -2,7 +2,13 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
+from carb_app.models import LyftToken, UberToken, LyftStats, UberStats, Squirt
+
+class SquirtSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    class Meta:
+        model = Squirt
+        fields = ('id', 'name', 'squirt1', 'squirt2', 'squirt3', 'owner', 'updated')
 
 class LyftTokenSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')

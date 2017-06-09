@@ -28,6 +28,7 @@ router.register(r'lyft_token', views.LyftTokenViewSet)
 router.register(r'uber_token', views.UberTokenViewSet)
 router.register(r'lyft_stats', views.LyftStatsViewSet)
 router.register(r'uber_stats', views.UberStatsViewSet)
+router.register(r'squirts', views.SquirtViewSet)
 router.register(r'users', views.UserViewSet, 'users')
 router.register(r'register', views.UserCreateViewSet)
 

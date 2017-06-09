@@ -8,9 +8,17 @@ from rest_framework import viewsets, permissions
 
 from rest_framework import filters
 
-from carb_app.models import LyftToken, UberToken, LyftStats, UberStats
-from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer, UserCreateSerializer
+from carb_app.models import LyftToken, UberToken, LyftStats, UberStats, Squirt
+from carb_app.serializers import UserSerializer, LyftTokenSerializer, UberTokenSerializer, LyftStatsSerializer, UberStatsSerializer, UserCreateSerializer, SquirtSerializer
 from carb_app.permissions import IsOwner, IsUser
+
+class SquirtViewSet(viewsets.ModelViewSet):
+    queryset = Squirt.objects.all()
+    serializer_class = SquirtSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = (filters.SearchFilter,)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 class LyftTokenViewSet(viewsets.ModelViewSet):
     queryset = LyftToken.objects.all()

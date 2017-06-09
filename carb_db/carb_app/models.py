@@ -80,6 +80,18 @@ class UberStats(models.Model):
         self.updated = datetime.datetime.now()
         super(UberStats, self).save(*args, **kwargs)
 
+class Squirt(models.Model):
+    name = models.CharField(max_length=24)
+    squirt1 = models.CharField(max_length=255,blank=True)
+    squirt2 = models.CharField(max_length=255,blank=True)
+    squirt3 = models.CharField(max_length=255,blank=True)
+    owner = models.ForeignKey('auth.User')
+    updated = models.DateTimeField(auto_now_add=True)
+    def __unicode__(self):
+        return unicode(self.name)
+    def save(self, *args, **kwargs):
+        self.updated = datetime.datetime.now()
+        super(UberStats, self).save(*args, **kwargs)
 
 
 # Create your models here.
