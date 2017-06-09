@@ -1,0 +1,20 @@
+<ion-content>
+<ion-card>
+  <ion-card-header>
+    Carb Login
+  </ion-card-header>
+  <ion-card-content>
+    <form (ngSubmit)="getToken()">
+      <ion-item>
+        <ion-label for="username">Username</ion-label>
+        <ion-input type="text" name="username" [(ngModel)]="model.username"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label for="password">Password</ion-label>
+        <ion-input type="password" name="password" [(ngModel)]="model.password"></ion-input>
+      </ion-item>
+      <button ion-button color="danger" type="submit" block outline>Login</button>
+    </form>
+  </ion-card-content>
+</ion-card>
+</ion-content>
