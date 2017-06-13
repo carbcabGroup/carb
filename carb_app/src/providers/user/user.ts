@@ -51,6 +51,7 @@ export class UserProvider {
         console.error(msg);
         return Observable.throw(msg);
     }
+
 }
 
 // Static helpers
