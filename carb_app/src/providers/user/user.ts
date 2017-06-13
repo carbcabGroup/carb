@@ -4,19 +4,14 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
+import { User } from '../../models/index';
+
 /*
     Generated class for the UserProvider provider.
 
     See https://angular.io/docs/ts/latest/guide/dependency-injection.html
     for more info on providers and Angular 2 DI.
 */
-
-export interface User {
-    id: number;
-    username: string;
-    lyft_token: number[];
-    uber_token: number[];
-}
 
 @Injectable()
 export class UserProvider {
