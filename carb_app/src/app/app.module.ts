@@ -7,7 +7,7 @@ import { HttpModule } from '@angular/http';
 
 import { MyApp } from './app.component';
 import { DTokenProvider } from '../providers/d-token/d-token';
-import { UserTokenProvider } from '../providers/user-token/user-token';
+import { UserProvider } from '../providers/user/user';
 
 @NgModule({
   declarations: [
@@ -27,7 +27,7 @@ import { UserTokenProvider } from '../providers/user-token/user-token';
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     DTokenProvider,
-    UserTokenProvider
+    UserProvider,
   ]
 })
 export class AppModule {}

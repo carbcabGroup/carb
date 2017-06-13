@@ -3,16 +3,23 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 
 /*
-  Generated class for the UserTokenProvider provider.
+  Generated class for the UserProvider provider.
 
   See https://angular.io/docs/ts/latest/guide/dependency-injection.html
   for more info on providers and Angular 2 DI.
 */
 @Injectable()
-export class UserTokenProvider {
+export class UserProvider {
+
+  public auth: string;
 
   constructor(public http: Http) {
-    console.log('Hello UserTokenProvider Provider');
+    console.log('user provider'); 
+  }
+
+  getUsers() {
+    this.auth = localStorage.getItem('currentUser')
+    console.log(JSON.parse(this.auth).token);
   }
 
 }

@@ -21,7 +21,7 @@ export class DTokenProvider {
     }
 
     login(username: string, password: string): Observable<boolean> {
-        let urlbase = 'http://52.15.168.69:8088';
+        let urlbase = 'http://13.58.151.236:8088';
         let path = '/api-token-auth/';
         let url = urlbase + path;
         let headers = new Headers({
