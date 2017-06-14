@@ -8,6 +8,8 @@ import { HttpModule } from '@angular/http';
 import { MyApp } from './app.component';
 import { DTokenProvider } from '../providers/d-token/d-token';
 import { UserProvider } from '../providers/user/user';
+import { UserServiceProvider } from '../providers/user-service/user-service';
+import { UserTokenProvider } from '../providers/user-token/user-token';
 
 @NgModule({
   declarations: [
@@ -28,6 +30,8 @@ import { UserProvider } from '../providers/user/user';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     DTokenProvider,
     UserProvider,
+    UserServiceProvider,
+    UserTokenProvider,
   ]
 })
 export class AppModule {}

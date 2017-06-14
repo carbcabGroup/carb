@@ -1,6 +1,16 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+
+import { Observable } from 'rxjs/Observable';
+
+import 'rxjs/add/operator/map'
+import 'rxjs/add/observable/from'
+import 'rxjs/add/operator/mergeAll'
+import 'rxjs/add/observable/of'
+
 import { UserProvider } from '../../providers/user/user';
+import { UserServiceProvider } from '../../providers/user-service/user-service';
+
 import { User } from '../../models/index';
 import { UserTokenData } from '../../models/index';
 /**
@@ -22,14 +32,15 @@ export class HomePage {
 
     constructor(public navCtrl: NavController,
                 public navParams: NavParams,
-                public user: UserProvider
+                public userPi: UserProvider,
+                public userConnectionService: UserServiceProvider,
                 ) {
     }
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad HomePage');
         console.log("Connecting to user API...");
-        let observedUsers = this.user.getUsers();
+        let observedUsers = this.userPi.getUsers();
         observedUsers.subscribe(users => {
             // update template
             this.userData = users;
@@ -37,6 +48,24 @@ export class HomePage {
         });
         console.log("...done.");
         console.log("Connecting to token API...");
+        let observedRequesters = observedUsers.map(users => {
+            return Observable.from(users);
+        });
+        let tokenRequesters: Observable<User> = observedRequesters.mergeAll();
+        let observedTokens = tokenRequesters.map(user => {
+            return this.userConnectionService.getUserTokens(user);
+        });
+        let userTokens = observedTokens.mergeAll();
+        userTokens.subscribe(tokens => {
+            this.tokenData = tokens;
+            var i;
+            for (i = 0; i < this.tokenData.length; i++) {
+                let tString = "Service: " + this.tokenData[i].serviceName
+                    + ", Token: " + this.tokenData[i].access_token;
+                this.tokenStrings.push(tString);
+            }
+        });
+        console.log("...done.");
     }
 
 }

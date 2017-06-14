@@ -1,6 +1,5 @@
 export class UserTokenData {
     serviceName: string;
-
     id: number;
     access_token: string;
     refresh_token: string;
