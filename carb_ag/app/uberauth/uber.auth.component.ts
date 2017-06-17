@@ -1,5 +1,5 @@
 ﻿import { Component, OnInit } from '@angular/core';
-import { URLSearchParams, Response } from '@angular/http';
+import { URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
 import 'rxjs/add/observable/from'
@@ -13,16 +13,17 @@ import { UberRequestService } from '../_services/index';
 
 @Component({
     moduleId: module.id,
-    templateUrl: 'home.component.html'
+    templateUrl: 'uber.auth.component.html'
 })
 
-export class HomeComponent implements OnInit {
+export class UberAuthComponent implements OnInit {
     // for the template
     userData: User[] = [];
     userString: string = "";
     tokenData: UserTokenData[] = [];
     tokenStrings: string[] = [];
     uberString: string;
+    authString: string;
 
     constructor(private userService: UserService,
                 private userConnectionService: UserConnectionService,
@@ -60,18 +61,5 @@ export class HomeComponent implements OnInit {
             }
         });
         console.log("...done.");
-
-        console.log("Attempting a public Uber API call...");
-        let uberPath = '/v1.2/products';
-        let uberParams = new URLSearchParams();
-        uberParams.set('latitude', '41.884441');
-        uberParams.set('longitude', '-87.628503');
-        let uberResponse: Observable<Response> = this.uberRequestService.get(uberPath, uberParams);
-        uberResponse.subscribe(r => {
-            this.uberString = r.statusText;
-            if (r.json()) {
-                this.uberString = this.uberString + r.json().toString();
-            }
-        });
     }
 }
