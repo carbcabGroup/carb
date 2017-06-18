@@ -198,3 +198,5 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': None,
 
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
