@@ -28,12 +28,12 @@ export class UserTokenService {
         }
         console.log('...tokens exist; continuing...');
         // add authorization header with jwt token
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let options = new RequestOptions({ headers: headers });
 
         console.log('Retrieving token details...');
-        let path = t_params.path + '/' + t_params.id[0] + '/';
+        let path = '/' + t_params.path + '/' + t_params.id[0] + '/';
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.get(url, options).map(r => {
             return mapTokenResp(r, t_params.serviceName);
@@ -44,7 +44,7 @@ export class UserTokenService {
     saveToken(t_params: TokenDataRequestParams, token: UserTokenData): Observable<UserTokenData[]> {
         console.log('Saving "' + t_params.serviceName + '" details...');
         // add authorization header with jwt token
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let body = { access_token: token.access_token,
                      access_token_exp: token.access_token_exp,
@@ -53,7 +53,7 @@ export class UserTokenService {
         let options = new RequestOptions({ headers: headers, body: body});
 
         console.log('Saving token details...');
-        let path = t_params.path + '/' + token.id + '/';
+        let path = '/' + t_params.path + '/' + token.id + '/';
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.put(url, options).map(r => {
             return mapTokenResp(r, t_params.serviceName);
@@ -65,11 +65,11 @@ export class UserTokenService {
     makeEmptyToken(t_params: TokenDataRequestParams): Observable<UserTokenData[]> {
         console.log('Creating empty "' + t_params.serviceName + '" token details...');
         // add authorization header with jwt token
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let options = new RequestOptions({ headers: headers });
 
-        let path = t_params.path + '/';
+        let path = '/' + t_params.path + '/';
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.post(url, options).map(r => {
             return mapTokenResp(r, t_params.serviceName);

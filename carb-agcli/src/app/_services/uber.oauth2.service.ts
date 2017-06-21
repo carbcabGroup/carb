@@ -36,7 +36,7 @@ export class UberOAuth2Service {
             client_id: client_id,
             client_secret: client_secret,
             grant_type: 'authorization_code',
-            redirect_uri: 'https://127.0.0.1:8000/carbuberauth',
+            redirect_uri: 'https://127.0.0.1:4200/uberauth',
             code: authCode
         });
 

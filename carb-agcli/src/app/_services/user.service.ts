@@ -17,13 +17,13 @@ export class UserService {
 
     getUsers(): Observable<User[]> {
         // add authorization header with jwt token
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let options = new RequestOptions({ headers: headers });
 
         // get user overview
         console.log('Getting user details...');
-        let path = '/users';
+        let path = '/users/';
         let url = urlbase + path;
         let userResults: Observable<User[]> = this.http.get(url, options)
             .map(mapUserResp).catch(this.handleError);

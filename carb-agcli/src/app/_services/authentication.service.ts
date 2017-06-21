@@ -14,7 +14,7 @@ export class AuthenticationService {
     }
 
     login(username: string, password: string): Observable<boolean> {
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let path = '/api-token-auth/';
         let url = urlbase + path;
         let headers = new Headers({
