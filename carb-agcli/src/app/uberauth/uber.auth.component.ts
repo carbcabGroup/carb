@@ -7,6 +7,7 @@ import 'rxjs/add/operator/mergeAll'
 
 import { User } from '../_models/index';
 import { UserTokenData } from '../_models/index';
+import { TokenDataRequestParams } from '../_models/index';
 import { TokenDataSearchParams } from '../_models/index';
 import { UserService } from '../_services/index';
 import { UserTokenService } from '../_services/index';
@@ -66,14 +67,14 @@ export class UberAuthComponent implements OnInit {
                     console.log('Updating token with new code...');
                     let t = tokens[0];
                     let t_params: TokenDataRequestParams = <TokenDataRequestParams>({
-                        serviceName: 'uber', path: '/uber_token/', id: t.id
+                        serviceName: 'uber', path: '/uber_token/', id: t.id[0]
                     });
                     let t_final = <UserTokenData>({
                         serviceName: t.serviceName,
                         id: t.id,
                         access_token: t.access_token,
                         refresh_token: t.refresh_token,
-                        access_token_exp: t.acess_token_exp,
+                        access_token_exp: t.access_token_exp,
                         auth_uuid: t.auth_uuid,
                         auth_code: urlParams['code'],
                         auth_scope: t.auth_scope,
@@ -87,7 +88,7 @@ export class UberAuthComponent implements OnInit {
                             console.log('Updated matching tokens.');
                         }
                     });
-                    console..log('...done').
+                    console.log('...done');
                 }
             });
         }
