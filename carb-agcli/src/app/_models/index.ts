@@ -1,6 +1,7 @@
 ﻿export * from './user';
 export * from './user.token.data';
 export * from './token.data.request.params';
+export * from './token.data.search.params';
 export * from './uber.auth.request.params';
 export * from './uber.auth.response';
 export * from './uber.token.request.params';
