@@ -22,12 +22,6 @@ export class UberOAuth2Service {
         private userTokenService: UserTokenService) {
     }
 
-    getUserAuth(state: string) {
-    }
-
-    receiveAuthCode(tokenData: UserTokenData, t_start: Date) {
-    }
-
     getToken(authCode: string): Observable<UberTokenResponse[]> {
         let client_id = '8mbR_i3W8ekCHYeb4xcCKbi__9OLx2pu';
         let client_secret = 'm1S9NG_UtuK2zMlUyOktpBc2e3R60GtyTCAgZ7qD';
@@ -78,6 +72,8 @@ export class UberOAuth2Service {
         console.log(tokenResults);
         return tokenResults;
     }
+
+    // TODO: revoke token
 
     private handleError(error: any) {
         let msg = error.message || "Error accessing API.";

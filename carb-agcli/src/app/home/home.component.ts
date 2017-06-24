@@ -1,4 +1,5 @@
 ﻿import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { URLSearchParams, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
@@ -23,8 +24,10 @@ export class HomeComponent implements OnInit {
     tokenData: UserTokenData[] = [];
     tokenStrings: string[] = [];
     uberString: string;
+    uberOAuthString: string;
 
-    constructor(private userService: UserService,
+    constructor(private router: Router,
+                private userService: UserService,
                 private userConnectionService: UserConnectionService,
                 private uberRequestService: UberRequestService) { }
 
@@ -70,8 +73,29 @@ export class HomeComponent implements OnInit {
         uberResponse.subscribe(r => {
             this.uberString = r.statusText;
             if (r.json()) {
-                this.uberString = this.uberString + r.json().toString();
+                this.uberString = this.uberString + ': ' + r.json().toString();
+            }
+        }); // fails CORS response
+        console.log("...done.");
+
+        console.log("Attempting an OAuth2 Uber API call...");
+        observedUsers.subscribe(users => {
+            if (users.length > 0) {
+                let user = users[0];
+                let uberOAuth2Response: Observable<Response> = this.uberRequestService
+                    .getOAuth2(uberPath, uberParams, user);
+                uberOAuth2Response.subscribe(r => {
+                    if (r) {
+                        this.uberOAuthString = r.statusText;
+                        if (r.json()) {
+                            this.uberOAuthString = this.uberOAuthString + ': ' + r.json().toString();
+                        }
+                    } else { // Start with completely new token
+                        this.router.navigate(['/uberauth']);
+                    }
+                });
             }
         });
+        console.log("...done.");
     }
 }

@@ -23,8 +23,8 @@ export class UserConnectionService {
         // a map of service names/API paths
         console.log('Getting token details for "' + user.username + '"...');
         var api_requests: TokenDataRequestParams[] = [
-                <TokenDataRequestParams>({ serviceName: 'lyft', path: '/lyft_token', id: user.lyft_token }),
-                <TokenDataRequestParams>({ serviceName: 'uber', path: '/uber_token', id: user.uber_token }),
+                <TokenDataRequestParams>({ serviceName: 'lyft', path: '/lyft_token/', id: user.lyft_token }),
+                <TokenDataRequestParams>({ serviceName: 'uber', path: '/uber_token/', id: user.uber_token }),
         ];
         let tokenRequests: Observable<TokenDataRequestParams> = Observable.from(api_requests);
         let observedTokens: Observable<Observable<UserTokenData[]>> = tokenRequests.map(params => {

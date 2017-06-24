@@ -29,25 +29,29 @@ export class UberRequestService {
         let serverToken = 'EJ0pcAbk9USM4McsYzCLOkYphlnmxWvElOEdxV74';
 
         var url = 'https://sandbox-api.uber.com';
+        //var url = 'https://api.uber.com';
         if (path.length > 0) {
             if (path[0] != '/') {
                 url = url + '/';
             }
             url = url + path;
         }
-        let headers = new Headers({ 'Authorization': 'Token ' + serverToken });
+        let headers = new Headers({
+            'Content-Type': 'application/json',
+            'Authorization': 'Token ' + serverToken
+        });
         let options = new RequestOptions({ headers: headers, params: params });
-        let apiResults: Observable<Response> = this.http.get(url, options).catch(this.handleError);
+        let apiResult: Observable<Response> = this.http.get(url, options).catch(this.handleError);
         console.log('Response info:');
-        console.log(apiResults);
-        return apiResults;
+        console.log(apiResult);
+        return apiResult;
     }
 
     getOAuth2(path: string, params: URLSearchParams, user: User): Observable<Response> {
         console.log('Searching for user "' + user.username + '"\'s tokens');
         // Get existing tokens for current user
         let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
-                                                   path: '/uber_token',
+                                                   path: '/uber_token/',
                                                    id: user.uber_token });
         let initObsTokens: Observable<UserTokenData[]> = this.userTokenService.getUserToken(t_request)
             .catch(this.handleError);
@@ -64,6 +68,7 @@ export class UberRequestService {
             }
         }).catch(this.handleError);
         let userTokens: Observable<UserTokenData[]> = finalObsTokens.mergeAll();
+
         console.log('Using token');
         let observedResponses: Observable<Observable<Response>> = userTokens.map(tokenData => {
             if (tokenData.length > 0 && tokenData[0].access_token_exp) { // Has some token
@@ -121,6 +126,7 @@ export class UberRequestService {
                     return apiResp;
                 }
             } else { // Start with completely new token
+                return null;
             }
         }).catch(this.handleError);
         let responses: Observable<Response> = observedResponses.mergeAll();
@@ -129,7 +135,11 @@ export class UberRequestService {
 
     callAPI(token: string, path: string, params: URLSearchParams): Observable<Response> {
         let urlbase = 'https://sandbox-api.uber.com';
-        let headers = new Headers({ 'Authorization': 'Bearer ' + token });
+        //let urlbase = 'https://api.uber.com';
+        let headers = new Headers({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+        });
         let options = new RequestOptions({ headers: headers, params: params});
 
         console.log('Calling Uber API...');
