@@ -73,8 +73,9 @@ export class UserTokenService {
         let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let body = { access_token: token.access_token,
-                     access_token_exp: token.access_token_exp,
                      refresh_token: token.refresh_token,
+                     access_token_exp: token.access_token_exp,
+                     auth_code: token.auth_code,
                      auth_scope: token.auth_scope };
         let options = new RequestOptions({ headers: headers, body: body});
 
@@ -93,11 +94,12 @@ export class UserTokenService {
         // add authorization header with jwt token
         let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+        let body = {};
         let options = new RequestOptions({ headers: headers });
 
         let path = t_params.path;
         let url = urlbase + path;
-        let userTokens: Observable<UserTokenData[]> = this.http.post(url, options).map(r => {
+        let userTokens: Observable<UserTokenData[]> = this.http.post(url, body, options).map(r => {
             return mapTokenResp(r, t_params.serviceName);
         }).catch(this.handleError);
         return userTokens;

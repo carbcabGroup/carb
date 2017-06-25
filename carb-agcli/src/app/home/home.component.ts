@@ -8,7 +8,9 @@ import 'rxjs/add/operator/mergeAll'
 
 import { User } from '../_models/index';
 import { UserTokenData } from '../_models/index';
+import { TokenDataRequestParams } from '../_models/index';
 import { UserService } from '../_services/index';
+import { UserTokenService } from '../_services/index';
 import { UserConnectionService } from '../_services/index';
 import { UberRequestService } from '../_services/index';
 
@@ -28,6 +30,7 @@ export class HomeComponent implements OnInit {
 
     constructor(private router: Router,
                 private userService: UserService,
+                private userTokenService: UserTokenService,
                 private userConnectionService: UserConnectionService,
                 private uberRequestService: UberRequestService) { }
 
@@ -85,13 +88,23 @@ export class HomeComponent implements OnInit {
                 let uberOAuth2Response: Observable<Response> = this.uberRequestService
                     .getOAuth2(uberPath, uberParams, user);
                 uberOAuth2Response.subscribe(r => {
+                    console.log('Handling OAuth2 Uber API call');
                     if (r) {
                         this.uberOAuthString = r.statusText;
                         if (r.json()) {
                             this.uberOAuthString = this.uberOAuthString + ': ' + r.json().toString();
                         }
                     } else { // Start with completely new token
-                        this.router.navigate(['/uberauth']);
+                        let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
+                                                                   path: '/uber_token/',
+                                                                   id: user.uber_token });
+                        let obsUberTokens = this.userTokenService.getUserToken(t_request);
+                        obsUberTokens.subscribe(tokens => {
+                            if (tokens.length > 0) {
+                                let state = tokens[0].auth_uuid;
+                                this.router.navigate(['/uberauth'], { queryParams: {state: state} });
+                            }
+                        });
                     }
                 });
             }

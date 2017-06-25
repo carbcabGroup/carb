@@ -66,10 +66,10 @@ export class UberAuthComponent implements OnInit {
                 if (tokens.length > 0) {
                     console.log('Updating token with new code...');
                     let t = tokens[0];
-                    let t_params: TokenDataRequestParams = <TokenDataRequestParams>({
-                        serviceName: 'uber', path: '/uber_token/', id: t.id[0]
-                    });
-                    let t_final = <UserTokenData>({
+                    let t_params = <TokenDataRequestParams>({ serviceName: 'uber',
+                                                              path: '/uber_token/',
+                                                              id: [t.id] });
+                    let t_final: UserTokenData = <UserTokenData>({
                         serviceName: t.serviceName,
                         id: t.id,
                         access_token: t.access_token,
