@@ -192,8 +192,8 @@ export class UberRequestService {
     }
 
     callAPI(token: string, path: string, params: URLSearchParams): Observable<Response> {
-        let urlbase = 'https://sandbox-api.uber.com';
-        //let urlbase = 'https://api.uber.com';
+        //let urlbase = 'https://sandbox-api.uber.com';
+        let urlbase = 'https://api.uber.com';
         let headers = new Headers({
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token

@@ -74,9 +74,13 @@ export class HomeComponent implements OnInit {
         uberParams.set('longitude', '-87.628503');
         let uberResponse: Observable<Response> = this.uberRequestService.get(uberPath, uberParams);
         uberResponse.subscribe(r => {
-            this.uberString = r.statusText;
+            this.uberString = r.status + ' ' + r.statusText;
             if (r.json()) {
-                this.uberString = this.uberString + ': ' + r.json().toString();
+                let s_json = JSON.stringify(r.json());
+                if (s_json.length > 128) {
+                    s_json = s_json.slice(0, 127) + " ...";
+                }
+                this.uberString = this.uberString + ': ' + s_json;
             }
         }); // fails CORS response
         console.log("...done.");
@@ -90,9 +94,13 @@ export class HomeComponent implements OnInit {
                 uberOAuth2Response.subscribe(r => {
                     console.log('Handling OAuth2 Uber API call');
                     if (r) {
-                        this.uberOAuthString = r.statusText;
+                        this.uberOAuthString = r.status + ' ' + r.statusText;
                         if (r.json()) {
-                            this.uberOAuthString = this.uberOAuthString + ': ' + r.json().toString();
+                            let s_json = JSON.stringify(r.json());
+                            if (s_json.length > 128) {
+                                s_json = s_json.slice(0, 127) + " ...";
+                            }
+                            this.uberOAuthString = this.uberOAuthString + ': ' + s_json;
                         }
                     } else { // Start with completely new token
                         let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
