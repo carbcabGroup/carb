@@ -1,7 +1,8 @@
 ﻿import { NgModule }      from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
-import { HttpModule }    from '@angular/http';
+//import { HttpModule }    from '@angular/http';
+import { HttpInterceptorModule } from '../http-interceptor/http.interceptor.module'
 
 import { AppComponent }  from './app.component';
 import { routing }       from './app.routing';
@@ -21,7 +22,8 @@ import { UberAuthComponent }  from './uberauth/index';
     imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
+        //HttpModule,
+        HttpInterceptorModule,
         routing
     ],
     declarations: [
