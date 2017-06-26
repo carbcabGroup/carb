@@ -25,11 +25,11 @@ export class HttpInterceptor extends Http {
         return this.intercept(super.get(url,options));
     }
 
-    post(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+    post(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
         return this.intercept(super.post(url, body, options));
     }
 
-    put(url: string, body: string, options?: RequestOptionsArgs): Observable<Response> {
+    put(url: string, body: any, options?: RequestOptionsArgs): Observable<Response> {
         return this.intercept(super.put(url, body, options));
     }
 

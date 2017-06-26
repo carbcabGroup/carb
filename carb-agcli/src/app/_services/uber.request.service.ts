@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
+//import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
+import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
+import { Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
@@ -19,7 +21,7 @@ import { UberOAuth2Service } from './index';
 @Injectable()
 export class UberRequestService {
     constructor(
-        private http: Http,
+        private http: HttpInterceptor,
         private authenticationService: AuthenticationService,
         private userTokenService: UserTokenService,
         private uberOAuth2Service: UberOAuth2Service) {

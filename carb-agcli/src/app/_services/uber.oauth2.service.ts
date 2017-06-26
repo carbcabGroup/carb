@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
+//import { Http, Headers, RequestOptions, Response } from '@angular/http';
+import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
+import { Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
@@ -18,7 +20,7 @@ import { UserTokenService } from './index';
 @Injectable()
 export class UberOAuth2Service {
     constructor(
-        private http: Http,
+        private http: HttpInterceptor,
         private userTokenService: UserTokenService) {
     }
 
@@ -26,6 +28,7 @@ export class UberOAuth2Service {
         let client_id = '8mbR_i3W8ekCHYeb4xcCKbi__9OLx2pu';
         let client_secret = 'm1S9NG_UtuK2zMlUyOktpBc2e3R60GtyTCAgZ7qD';
 
+        let headers = new Headers({ 'Content-Type': 'application/json' });
         let body = <UberTokenRequestParams>({
             client_id: client_id,
             client_secret: client_secret,
@@ -35,13 +38,13 @@ export class UberOAuth2Service {
         });
 
         let urlbase = 'https://login.uber.com';
-        let options = new RequestOptions({ body: body });
+        let options = new RequestOptions({ headers: headers });
 
         // get user overview
         console.log('Getting new uber token...');
         let path = '/oauth/v2/token';
         let url = urlbase + path;
-        let tokenResults: Observable<UberTokenResponse[]> = this.http.post(url, options)
+        let tokenResults: Observable<UberTokenResponse[]> = this.http.post(url, body, options)
             .map(mapTokenResp).catch(this.handleError);
         console.log('Token info:');
         console.log(tokenResults);
@@ -52,6 +55,7 @@ export class UberOAuth2Service {
         let client_id = '8mbR_i3W8ekCHYeb4xcCKbi__9OLx2pu';
         let client_secret = 'm1S9NG_UtuK2zMlUyOktpBc2e3R60GtyTCAgZ7qD';
 
+        let headers = new Headers({ 'Content-Type': 'application/json' });
         let body = <UberRefreshRequestParams>({
             client_id: client_id,
             client_secret: client_secret,
@@ -60,13 +64,13 @@ export class UberOAuth2Service {
         });
 
         let urlbase = 'https://login.uber.com';
-        let options = new RequestOptions({ body: body });
+        let options = new RequestOptions({ headers: headers });
 
         // get user overview
         console.log('Getting new uber token...');
         let path = '/oauth/v2/token';
         let url = urlbase + path;
-        let tokenResults: Observable<UberTokenResponse[]> = this.http.post(url, options)
+        let tokenResults: Observable<UberTokenResponse[]> = this.http.post(url, body, options)
             .map(mapTokenResp).catch(this.handleError);
         console.log('Token info:');
         console.log(tokenResults);

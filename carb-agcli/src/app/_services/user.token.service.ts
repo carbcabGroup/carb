@@ -1,5 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
+//import { Http, Headers, RequestOptions, Response } from '@angular/http';
+import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
+import { Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
@@ -15,7 +17,7 @@ import { TokenDataSearchParams } from '../_models/index';
 @Injectable()
 export class UserTokenService {
     constructor(
-        private http: Http,
+        private http: HttpInterceptor,
         private authenticationService: AuthenticationService) {
     }
 
@@ -77,12 +79,12 @@ export class UserTokenService {
                      access_token_exp: token.access_token_exp,
                      auth_code: token.auth_code,
                      auth_scope: token.auth_scope };
-        let options = new RequestOptions({ headers: headers, body: body});
+        let options = new RequestOptions({ headers: headers });
 
         console.log('Saving token details...');
         let path = t_params.path + token.id + '/';
         let url = urlbase + path;
-        let userTokens: Observable<UserTokenData[]> = this.http.put(url, options).map(r => {
+        let userTokens: Observable<UserTokenData[]> = this.http.put(url, body, options).map(r => {
             return mapTokenResp(r, t_params.serviceName);
         }).catch(this.handleError);
         return userTokens;
