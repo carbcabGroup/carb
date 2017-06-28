@@ -6,14 +6,13 @@ import { Http,
          RequestOptionsArgs,
          Response,
          Headers } from '@angular/http';
-import { NavController } from 'ionic-angular';
 import { Observable } from 'rxjs/Observable';
 
 // Wrap all requests with interecept() to catch errors early
 @Injectable()
 export class HttpInterceptor extends Http {
 
-    constructor(backend: ConnectionBackend, defaultOptions: RequestOptions, private _navCtrl: NavController) {
+    constructor(backend: ConnectionBackend, defaultOptions: RequestOptions) {
         super(backend, defaultOptions);
     }
 
