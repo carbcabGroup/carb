@@ -27,7 +27,7 @@ export class UserProvider {
         this.auth = localStorage.getItem('currentUser')
         console.log(JSON.parse(this.auth).token);
         this.token = JSON.parse(this.auth).token
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.token });
         let options = new RequestOptions({ headers: headers });
 

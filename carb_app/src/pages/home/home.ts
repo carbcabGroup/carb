@@ -66,6 +66,58 @@ export class HomePage {
             }
         });
         console.log("...done.");
+        
+        console.log("Attempting a public Uber API call...");
+        let uberPath = '/v1.2/products';
+        let uberParams = new URLSearchParams();
+        uberParams.set('latitude', '41.884441');
+        uberParams.set('longitude', '-87.628503');
+        let uberResponse: Observable<Response> = this.uberRequestService.get(uberPath, uberParams);
+        uberResponse.subscribe(r => {
+            this.uberString = r.status + ' ' + r.statusText;
+            if (r.json()) {
+                let s_json = JSON.stringify(r.json());
+                if (s_json.length > 128) {
+                    s_json = s_json.slice(0, 127) + " ...";
+                }
+                this.uberString = this.uberString + ': ' + s_json;
+            }
+        }); // fails CORS response
+        console.log("...done.");
+
+        console.log("Attempting an OAuth2 Uber API call...");
+        observedUsers.subscribe(users => {
+            if (users.length > 0) {
+                let user = users[0];
+                let uberOAuth2Response: Observable<Response> = this.uberRequestService
+                    .getOAuth2(uberPath, uberParams, user);
+                uberOAuth2Response.subscribe(r => {
+                    console.log('Handling OAuth2 Uber API call');
+                    if (r) {
+                        this.uberOAuthString = r.status + ' ' + r.statusText;
+                        if (r.json()) {
+                            let s_json = JSON.stringify(r.json());
+                            if (s_json.length > 128) {
+                                s_json = s_json.slice(0, 127) + " ...";
+                            }
+                            this.uberOAuthString = this.uberOAuthString + ': ' + s_json;
+                        }
+                    } else { // Start with completely new token
+                        let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
+                                                                   path: '/uber_token/',
+                                                                   id: user.uber_token });
+                        let obsUberTokens = this.userTokenService.getUserToken(t_request);
+                        obsUberTokens.subscribe(tokens => {
+                            if (tokens.length > 0) {
+                                let state = tokens[0].auth_uuid;
+                                this.router.navigate(['/uberauth'], { queryParams: {state: state} });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        console.log("...done.");
     }
 
 }

@@ -37,7 +37,7 @@ export class UserTokenProvider {
         }
         console.log('...tokens exist; continuing...');
         // add authorization header with jwt token
-        let urlbase = 'http://13.58.151.236:8088';
+        let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.token });
         let options = new RequestOptions({ headers: headers });
 
