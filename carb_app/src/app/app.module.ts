@@ -5,6 +5,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { HttpModule } from '@angular/http';
 
+import { HttpInterceptorModule } from '../http-interceptor/http.interceptor.module'
+
 import { MyApp } from './app.component';
 import { DTokenProvider } from '../providers/d-token/d-token';
 import { UserProvider } from '../providers/user/user';
@@ -13,6 +15,8 @@ import { UserTokenProvider } from '../providers/user-token/user-token';
 import { UberRequestProvider } from '../providers/uber-request/uber-request';
 import { UberOauth2Provider } from '../providers/uber-oauth2/uber-oauth2';
 
+
+
 @NgModule({
   declarations: [
     MyApp
@@ -20,7 +24,8 @@ import { UberOauth2Provider } from '../providers/uber-oauth2/uber-oauth2';
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp),
-    HttpModule
+    HttpModule,
+    HttpInterceptorModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
