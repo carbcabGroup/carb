@@ -21,7 +21,7 @@ export class UserProvider {
     public token: string;
 
     constructor(public http: HttpInterceptor) {
-        console.log('user provider'); 
+        console.log('user provider');
     }
 
     getUsers() {
@@ -34,7 +34,7 @@ export class UserProvider {
 
         // get user overview
         console.log('Getting user details...');
-        let path = '/users';
+        let path = '/users/';
         let url = urlbase + path;
         let userResults = this.http.get(url, options).map(mapUserResp).catch(this.handleError);
         console.log('User info:');
