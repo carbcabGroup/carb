@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
+import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
+import { Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
@@ -19,7 +20,7 @@ export class UserProvider {
     public auth: string;
     public token: string;
 
-    constructor(public http: Http) {
+    constructor(public http: HttpInterceptor) {
         console.log('user provider'); 
     }
 

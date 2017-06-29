@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
@@ -22,8 +21,7 @@ import { TokenDataRequestParams } from '../../models/index';
 @Injectable()
 export class UserServiceProvider {
 
-    constructor(public http: Http,
-                private userTokenService: UserTokenProvider,) {
+    constructor(private userTokenService: UserTokenProvider,) {
         console.log('Hello UserServiceProvider Provider');
     }
 

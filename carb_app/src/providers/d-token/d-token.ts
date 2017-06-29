@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, Response , RequestOptions } from '@angular/http';
+import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
+import { Headers, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map';
 
@@ -14,7 +15,7 @@ import 'rxjs/add/operator/map';
 export class DTokenProvider {
     public token: string;
 
-    constructor(public http: Http) {
+    constructor(public http: HttpInterceptor) {
         console.log('Hello DTokenProvider Provider');
         var currentUser = JSON.parse(localStorage.getItem('currentUser'));
         this.token = currentUser && currentUser.token;
