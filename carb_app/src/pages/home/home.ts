@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController } from 'ionic-angular';
+import { URLSearchParams, Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Observable';
 
@@ -8,11 +9,15 @@ import 'rxjs/add/observable/from'
 import 'rxjs/add/operator/mergeAll'
 import 'rxjs/add/observable/of'
 
-import { UserProvider } from '../../providers/user/user';
-import { UserServiceProvider } from '../../providers/user-service/user-service';
-
 import { User } from '../../models/index';
 import { UserTokenData } from '../../models/index';
+import { TokenDataRequestParams } from '../../models/index';
+
+import { UserProvider } from '../../providers/user/user';
+import { UserServiceProvider } from '../../providers/user-service/user-service';
+import { UserTokenProvider } from '../../providers/user-token/user-token';
+import { UberRequestProvider } from '../../providers/uber-request/uber-request';
+
 /**
  * Generated class for the HomePage page.
  *
@@ -29,11 +34,14 @@ export class HomePage {
     userString: string = "";
     tokenData: UserTokenData[] = [];
     tokenStrings: string[] = []; // for the template
+    uberString: string;
+    uberOAuthString: string;
 
     constructor(public navCtrl: NavController,
-                public navParams: NavParams,
                 public userPi: UserProvider,
+                private userTokenService: UserTokenProvider,
                 public userConnectionService: UserServiceProvider,
+                private uberRequestService: UberRequestProvider
                 ) {
     }
 
@@ -66,5 +74,58 @@ export class HomePage {
             }
         });
         console.log("...done.");
+
+        console.log("Attempting a public Uber API call...");
+        let uberPath = '/v1.2/products';
+        let uberParams = new URLSearchParams();
+        uberParams.set('latitude', '41.884441');
+        uberParams.set('longitude', '-87.628503');
+        let uberResponse: Observable<Response> = this.uberRequestService.get(uberPath, uberParams);
+        uberResponse.subscribe(r => {
+            this.uberString = r.status + ' ' + r.statusText;
+            if (r.json()) {
+                let s_json = JSON.stringify(r.json());
+                if (s_json.length > 128) {
+                    s_json = s_json.slice(0, 127) + " ...";
+                }
+                this.uberString = this.uberString + ': ' + s_json;
+            }
+        }); // fails CORS response
+        console.log("...done.");
+
+        console.log("Attempting an OAuth2 Uber API call...");
+        observedUsers.subscribe(users => {
+            if (users.length > 0) {
+                let user = users[0];
+                let uberOAuth2Response: Observable<Response> = this.uberRequestService
+                    .getOAuth2(uberPath, uberParams, user);
+                uberOAuth2Response.subscribe(r => {
+                    console.log('Handling OAuth2 Uber API call');
+                    if (r) {
+                        this.uberOAuthString = r.status + ' ' + r.statusText;
+                        if (r.json()) {
+                            let s_json = JSON.stringify(r.json());
+                            if (s_json.length > 128) {
+                                s_json = s_json.slice(0, 127) + " ...";
+                            }
+                            this.uberOAuthString = this.uberOAuthString + ': ' + s_json;
+                        }
+                    } else { // Start with completely new token
+                        let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
+                                                                   path: '/uber_token/',
+                                                                   id: user.uber_token });
+                        let obsUberTokens = this.userTokenService.getUserToken(t_request);
+                        obsUberTokens.subscribe(tokens => {
+                            if (tokens.length > 0) {
+                                let state = tokens[0].auth_uuid;
+                                this.navCtrl.push("UberAuthPage", {state: state});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        console.log("...done.");
+
     }
 }
