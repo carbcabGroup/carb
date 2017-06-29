@@ -43,7 +43,7 @@ export class UserTokenProvider {
         let options = new RequestOptions({ headers: headers });
 
         console.log('Retrieving token details...');
-        let path = t_params.path + '/' + t_params.id[0] + '/';
+        let path = t_params.path + t_params.id[0] + '/';
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.get(url, options).map(r => {
             return mapTokenResp(r, t_params.serviceName);
