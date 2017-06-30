@@ -21,30 +21,30 @@ export class UserProvider {
     public token: string;
 
     constructor(public http: HttpInterceptor) {
-        console.log('user provider');
+        //console.log('user provider');
     }
 
     getUsers() {
         this.auth = localStorage.getItem('currentUser')
-        console.log(JSON.parse(this.auth).token);
+        //console.log(JSON.parse(this.auth).token);
         this.token = JSON.parse(this.auth).token
         let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.token });
         let options = new RequestOptions({ headers: headers });
 
         // get user overview
-        console.log('Getting user details...');
+        //console.log('Getting user details...');
         let path = '/users/';
         let url = urlbase + path;
         let userResults = this.http.get(url, options).map(mapUserResp).catch(this.handleError);
-        console.log('User info:');
-        console.log(userResults);
+        //console.log('User info:');
+        //console.log(userResults);
         return userResults;
     }
 
     private handleError(error: any) {
         let msg = error.message || "Error accessing API.";
-        console.error(msg);
+        //console.error(msg);
         return Observable.throw(msg);
     }
 
@@ -52,7 +52,7 @@ export class UserProvider {
 
 // Static helpers
 function mapUserResp(r: Response): User[]{
-    console.log('Mapping a user API response...');
+    //console.log('Mapping a user API response...');
     return r.json().results.map(toUser);
 }
 
@@ -63,6 +63,6 @@ function toUser(r: any): User{
         lyft_token: r.lyft_token,
         uber_token: r.uber_token,
     });
-    console.log('Parsed user:', user);
+    //console.log('Parsed user:', user);
     return user;
 }

@@ -43,7 +43,7 @@ export class UberAuthPage {
     }
 
     ionViewDidLoad() {
-        console.log('ionViewDidLoad UberAuthPage');
+        //console.log('ionViewDidLoad UberAuthPage');
     }
 
 }

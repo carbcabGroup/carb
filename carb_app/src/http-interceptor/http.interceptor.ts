@@ -52,15 +52,15 @@ export class HttpInterceptor extends Http {
     // Optional wrapper to catch any bad responses
     intercept(observable: Observable<Response>): Observable<Response> {
         return observable.catch((err: Response, caught) => {
-            console.log('Error:');
-            console.log(err);
-            console.log('Source:');
-            console.log(caught);
+            //console.log('Error:');
+            //console.log(err);
+            //console.log('Source:');
+            //console.log(caught);
             if (err.status == 401) {
-                console.log('Caught unauthorized request.');
+                //console.log('Caught unauthorized request.');
                 return Observable.empty();
             } else {
-                console.log('Caught unknown error.');
+                //console.log('Caught unknown error.');
                 return Observable.throw(err);
             }
         });

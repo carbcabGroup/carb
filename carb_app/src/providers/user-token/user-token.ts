@@ -23,26 +23,26 @@ export class UserTokenProvider {
     public token: string;
 
     constructor(public http: HttpInterceptor) {
-        console.log('Hello UserTokenProvider Provider');
+        //console.log('Hello UserTokenProvider Provider');
     }
 
     // Get a specific token
     getUserToken(t_params: TokenDataRequestParams): Observable<UserTokenData[]> {
         this.auth = localStorage.getItem('currentUser');
         this.token = JSON.parse(this.auth).token;
-        console.log('Getting "' + t_params.serviceName + '" details...');
+        //console.log('Getting "' + t_params.serviceName + '" details...');
         if (t_params.id.length == 0) {
-            console.log('...no tokens for this service.');
+            //console.log('...no tokens for this service.');
             let userTokens: UserTokenData[] = [];
             return Observable.of(userTokens);
         }
-        console.log('...tokens exist; continuing...');
+        //console.log('...tokens exist; continuing...');
         // add authorization header with jwt token
         let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.token });
         let options = new RequestOptions({ headers: headers });
 
-        console.log('Retrieving token details...');
+        //console.log('Retrieving token details...');
         let path = t_params.path + t_params.id[0] + '/';
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.get(url, options).map(r => {
@@ -53,15 +53,15 @@ export class UserTokenProvider {
 
     // Get a specific  token by uuid
     getUserTokenByUuid(t_params: TokenDataSearchParams): Observable<UserTokenData[]> {
-        console.log('Getting "' + t_params.serviceName + '" details...');
+        //console.log('Getting "' + t_params.serviceName + '" details...');
         this.auth = localStorage.getItem('currentUser');
         this.token = JSON.parse(this.auth).token;
         if (!t_params.authUuid) {
-            console.log('...invalid token state.');
+            //console.log('...invalid token state.');
             let userTokens: UserTokenData[] = [];
             return Observable.of(userTokens);
         }
-        console.log('...tokens exist; continuing...');
+        //console.log('...tokens exist; continuing...');
         // add authorization header with jwt token
         let urlbase = 'https://13.58.151.236:8088';
         let headers = new Headers({ 'Authorization': 'JWT ' + this.token });
@@ -69,7 +69,7 @@ export class UserTokenProvider {
         params.set('search', t_params.authUuid);
         let options = new RequestOptions({ headers: headers, params: params });
 
-        console.log('Retrieving token details...');
+        //console.log('Retrieving token details...');
         let path = t_params.path;
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.get(url, options).map(r => {
@@ -79,7 +79,7 @@ export class UserTokenProvider {
     }
 
     saveToken(t_params: TokenDataRequestParams, token: UserTokenData): Observable<UserTokenData[]> {
-        console.log('Saving "' + t_params.serviceName + '" details...');
+        //console.log('Saving "' + t_params.serviceName + '" details...');
         this.auth = localStorage.getItem('currentUser');
         this.token = JSON.parse(this.auth).token;
         // add authorization header with jwt token
@@ -92,7 +92,7 @@ export class UserTokenProvider {
                      auth_scope: token.auth_scope };
         let options = new RequestOptions({ headers: headers });
 
-        console.log('Saving token details...');
+        //console.log('Saving token details...');
         let path = t_params.path + token.id + '/';
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.put(url, body, options).map(r => {
@@ -103,7 +103,7 @@ export class UserTokenProvider {
 
     // Initialize empty token in database
     makeEmptyToken(t_params: TokenDataRequestParams): Observable<UserTokenData[]> {
-        console.log('Creating empty "' + t_params.serviceName + '" token details...');
+        //console.log('Creating empty "' + t_params.serviceName + '" token details...');
         this.auth = localStorage.getItem('currentUser');
         this.token = JSON.parse(this.auth).token;
         // add authorization header with jwt token
@@ -122,7 +122,7 @@ export class UserTokenProvider {
 
     private handleError(error: any) {
         let msg = error.message || "Error accessing API.";
-        console.error(msg);
+        //console.error(msg);
         return Observable.throw(msg);
     }
 
@@ -130,7 +130,7 @@ export class UserTokenProvider {
 
 // Static helpers
 function mapTokenResp(r: Response, n: string): UserTokenData[]{
-    console.log('Mapping a token API response...');
+    //console.log('Mapping a token API response...');
     let tokenData: UserTokenData = toUserTokenData(r.json());
     tokenData.serviceName = n;
     return [tokenData];
@@ -149,6 +149,6 @@ function toUserTokenData(r: any): UserTokenData{
         owner: r.owner,
         updated: r.updated,
     });
-    console.log('Parsed user token:', token);
+    //console.log('Parsed user token:', token);
     return token;
 }

@@ -25,7 +25,7 @@ export class UberOauth2Provider {
 
     constructor(public http: HttpInterceptor,
         private userTokenService: UserTokenProvider) {
-        console.log('Hello UberOauth2Provider Provider');
+        //console.log('Hello UberOauth2Provider Provider');
         this.client_id = '8mbR_i3W8ekCHYeb4xcCKbi__9OLx2pu';
         this.client_secret = 'm1S9NG_UtuK2zMlUyOktpBc2e3R60GtyTCAgZ7qD';
     }
@@ -45,13 +45,13 @@ export class UberOauth2Provider {
         let options = new RequestOptions({ headers: headers });
 
         // get user overview
-        console.log('Getting new uber token...');
+        //console.log('Getting new uber token...');
         let path = '/oauth/v2/token';
         let url = urlbase + path;
         let tokenResults: Observable<UberTokenResponse[]> = this.http.post(url, body, options)
             .map(mapTokenResp).catch(this.handleError);
-        console.log('Token info:');
-        console.log(tokenResults);
+        //console.log('Token info:');
+        //console.log(tokenResults);
         return tokenResults;
     }
 
@@ -69,26 +69,26 @@ export class UberOauth2Provider {
         let options = new RequestOptions({ headers: headers });
 
         // get user overview
-        console.log('Getting new uber token...');
+        //console.log('Getting new uber token...');
         let path = '/oauth/v2/token';
         let url = urlbase + path;
         let tokenResults: Observable<UberTokenResponse[]> = this.http.post(url, body, options)
             .map(mapTokenResp).catch(this.handleError);
-        console.log('Token info:');
-        console.log(tokenResults);
+        //console.log('Token info:');
+        //console.log(tokenResults);
         return tokenResults;
     }
 
     private handleError(error: any) {
         let msg = error.message || "Error accessing API.";
-        console.error(msg);
+        //console.error(msg);
         return Observable.throw(msg);
     }
 }
 
 // Static helpers
 function mapTokenResp(r: Response): UberTokenResponse[]{
-    console.log('Mapping an Uber token response...');
+    //console.log('Mapping an Uber token response...');
     return r.json().results.map(toUberTokenResponse);
 }
 
@@ -100,7 +100,7 @@ function toUberTokenResponse(r: any): UberTokenResponse{
         refresh_token: r.refresh_token,
         scope: r.scope
     });
-    console.log('Parsed token:', t);
+    //console.log('Parsed token:', t);
     return t;
 }
 

@@ -46,16 +46,16 @@ export class HomePage {
     }
 
     ionViewDidLoad() {
-        console.log('ionViewDidLoad HomePage');
-        console.log("Connecting to user API...");
+        //console.log('ionViewDidLoad HomePage');
+        //console.log("Connecting to user API...");
         let observedUsers = this.userPi.getUsers();
         observedUsers.subscribe(users => {
             // update template
             this.userData = users;
             this.userString = this.userData[0].username;
         });
-        console.log("...done.");
-        console.log("Connecting to token API...");
+        //console.log("...done.");
+        //console.log("Connecting to token API...");
         let observedRequesters = observedUsers.map(users => {
             return Observable.from(users);
         });
@@ -73,9 +73,9 @@ export class HomePage {
                 this.tokenStrings.push(tString);
             }
         });
-        console.log("...done.");
+        //console.log("...done.");
 
-        console.log("Attempting a public Uber API call...");
+        //console.log("Attempting a public Uber API call...");
         let uberPath = '/v1.2/products';
         let uberParams = new URLSearchParams();
         uberParams.set('latitude', '41.884441');
@@ -91,16 +91,16 @@ export class HomePage {
                 this.uberString = this.uberString + ': ' + s_json;
             }
         }); // fails CORS response
-        console.log("...done.");
+        //console.log("...done.");
 
-        console.log("Attempting an OAuth2 Uber API call...");
+        //console.log("Attempting an OAuth2 Uber API call...");
         observedUsers.subscribe(users => {
             if (users.length > 0) {
                 let user = users[0];
                 let uberOAuth2Response: Observable<Response> = this.uberRequestService
                     .getOAuth2(uberPath, uberParams, user);
                 uberOAuth2Response.subscribe(r => {
-                    console.log('Handling OAuth2 Uber API call');
+                    //console.log('Handling OAuth2 Uber API call');
                     if (r) {
                         this.uberOAuthString = r.status + ' ' + r.statusText;
                         if (r.json()) {
@@ -125,7 +125,7 @@ export class HomePage {
                 });
             }
         });
-        console.log("...done.");
+        //console.log("...done.");
 
     }
 }

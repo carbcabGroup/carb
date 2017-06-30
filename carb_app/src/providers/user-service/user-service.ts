@@ -22,7 +22,7 @@ import { TokenDataRequestParams } from '../../models/index';
 export class UserServiceProvider {
 
     constructor(private userTokenService: UserTokenProvider,) {
-        console.log('Hello UserServiceProvider Provider');
+        //console.log('Hello UserServiceProvider Provider');
     }
 
     // Get all the tokens associated with a user
@@ -30,7 +30,7 @@ export class UserServiceProvider {
         // get tokens from api
         // ...maybe use a services class to manage
         // a map of service names/API paths
-        console.log('Getting token details for "' + user.username + '"...');
+        //console.log('Getting token details for "' + user.username + '"...');
         var api_requests: TokenDataRequestParams[] = [
                 <TokenDataRequestParams>({ serviceName: 'lyft', path: '/lyft_token/', id: user.lyft_token }),
                 <TokenDataRequestParams>({ serviceName: 'uber', path: '/uber_token/', id: user.uber_token }),
@@ -40,14 +40,14 @@ export class UserServiceProvider {
             return this.userTokenService.getUserToken(params);
         }).catch(this.handleError);
         let userTokens = observedTokens.mergeAll();
-        console.log('Token info:');
-        console.log(userTokens);
+        //console.log('Token info:');
+        //console.log(userTokens);
         return userTokens;
     }
 
     private handleError(error: any) {
         let msg = error.message || "Error accessing API.";
-        console.error(msg);
+        //console.error(msg);
         return Observable.throw(msg);
     }
 

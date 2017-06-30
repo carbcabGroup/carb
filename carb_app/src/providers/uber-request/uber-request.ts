@@ -27,7 +27,7 @@ export class UberRequestProvider {
     constructor(public http: HttpInterceptor,
                 private userTokenService: UserTokenProvider,
                 private uberOAuth2Service: UberOauth2Provider) {
-        console.log('Hello UberRequestProvider Provider');
+        //console.log('Hello UberRequestProvider Provider');
     }
 
     get(path: string, params: URLSearchParams): Observable<Response> {
@@ -46,15 +46,15 @@ export class UberRequestProvider {
             'Authorization': 'Token ' + serverToken
         });
         let options = new RequestOptions({ headers: headers, params: params });
-        console.log('Calling Uber public API...');
+        //console.log('Calling Uber public API...');
         let apiResult: Observable<Response> = this.http.get(url, options).catch(this.handleError);
-        console.log('Response info:');
-        console.log(apiResult);
+        //console.log('Response info:');
+        //console.log(apiResult);
         return apiResult;
     }
 
     getOAuth2(path: string, params: URLSearchParams, user: User): Observable<Response> {
-        console.log('Searching for user "' + user.username + '"\'s tokens');
+        //console.log('Searching for user "' + user.username + '"\'s tokens');
         // Get existing tokens for current user
         let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
                                                    path: '/uber_token/',
@@ -63,7 +63,7 @@ export class UberRequestProvider {
             .catch(this.handleError);
         let finalObsTokens: Observable<Observable<UserTokenData[]>> = initObsTokens.map(tokens => {
             if (tokens.length == 0) {
-                console.log('Creating blank token');
+                //console.log('Creating blank token');
                 let newObsToken: Observable<UserTokenData[]> = this.userTokenService.makeEmptyToken(t_request)
                     .catch(this.handleError);
                 // continue with fresh token
@@ -75,20 +75,20 @@ export class UberRequestProvider {
         }).catch(this.handleError);
         let userTokens: Observable<UserTokenData[]> = finalObsTokens.mergeAll();
 
-        console.log('Using token');
+        //console.log('Using token');
         let observedResponses: Observable<Observable<Response>> = userTokens.map(tokenData => {
             if (tokenData.length > 0 && tokenData[0].access_token_exp) { // Has some token data
-                console.log('Token contains access details');
+                //console.log('Token contains access details');
                 var token = tokenData[0];
                 var t_now = new Date().getTime();
                 var t_exp = new Date(token.access_token_exp).getTime();
                 if (t_now < t_exp) { // Token still fresh
-                    console.log('Using valid token');
+                    //console.log('Using valid token');
                     let apiResponse: Observable<Response> = this.callAPI(token.access_token,
                                                                            path, params).catch(this.handleError);
                     return apiResponse;
                 } else {
-                    console.log('Refreshing token');
+                    //console.log('Refreshing token');
                     let t_issue = new Date();
                     let refreshResponse: Observable<UberTokenResponse[]> = this.uberOAuth2Service
                         .refreshToken(token.refresh_token)
@@ -112,7 +112,7 @@ export class UberRequestProvider {
                             let saveResp: Observable<UserTokenData[]> = this.userTokenService
                                 .saveToken(t_request, freshToken)
                                 .catch(this.handleError);
-                            console.log('Using valid refreshed token');
+                            //console.log('Using valid refreshed token');
                             let obsApiResp: Observable<Observable<Response>> = saveResp.map(tokens => {
                                 if (tokens.length > 0) {
                                     let apiResponse: Observable<Response> = this.callAPI(tokens[0].access_token,
@@ -133,14 +133,14 @@ export class UberRequestProvider {
                     return apiResp;
                 }
             } else { // Start with completely new token
-                console.log('Token details are incomplete');
+                //console.log('Token details are incomplete');
                 if (tokenData.length == 0) {
                     return Observable.throw('Prior token creation failed.');
                 }
                 var token = tokenData[0];
                 // use auth code to get token
                 if (token.auth_code) {
-                    console.log('Getting new token');
+                    //console.log('Getting new token');
                     let t_issue = new Date();
                     let getResponse: Observable<UberTokenResponse[]> = this.uberOAuth2Service
                         .getToken(token.auth_code)
@@ -164,7 +164,7 @@ export class UberRequestProvider {
                             let saveResp: Observable<UserTokenData[]> = this.userTokenService
                                 .saveToken(t_request, freshToken)
                                 .catch(this.handleError);
-                            console.log('Using valid new token');
+                            //console.log('Using valid new token');
                             let obsApiResp: Observable<Observable<Response>> = saveResp.map(tokens => {
                                 if (tokens.length > 0) {
                                     let apiResponse: Observable<Response> = this.callAPI(tokens[0].access_token,
@@ -184,7 +184,7 @@ export class UberRequestProvider {
                     let apiResp: Observable<Response> = obsApiResponse.mergeAll();
                     return apiResp;
                 } else { // will fail; requires authorization redirect
-                    console.log('Token access not yet authorized');
+                    //console.log('Token access not yet authorized');
                     let apiResponse: Observable<Response> = this.callAPI("", path, params).catch(this.handleError);
                     return apiResponse;
                 }
@@ -203,7 +203,7 @@ export class UberRequestProvider {
         });
         let options = new RequestOptions({ headers: headers, params: params});
 
-        console.log('Calling Uber OAuth2 API...');
+        //console.log('Calling Uber OAuth2 API...');
         let url = urlbase + path;
         let resp: Observable<Response> = this.http.get(url, options).catch(this.handleError);
         return resp;
@@ -211,7 +211,7 @@ export class UberRequestProvider {
 
     private handleError(error: any) {
         let msg = error.message || "Error accessing API.";
-        console.error(msg);
+        //console.error(msg);
         return Observable.throw(msg);
     }
 }
