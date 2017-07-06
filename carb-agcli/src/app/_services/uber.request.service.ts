@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 //import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
 import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
-import { Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
+import { Headers, URLSearchParams, RequestOptions, Response, ResponseOptions } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/mergeAll'
 import 'rxjs/add/observable/of'
+import 'rxjs/add/observable/empty'
 
 import { User } from '../_models/index';
 import { TokenDataRequestParams } from '../_models/index';
 import { UserTokenData } from '../_models/index';
 import { UberTokenResponse } from '../_models/index';
 
-import { AuthenticationService } from './index';
 import { UserTokenService } from './index';
 import { UberOAuth2Service } from './index';
 
@@ -22,7 +22,6 @@ import { UberOAuth2Service } from './index';
 export class UberRequestService {
     constructor(
         private http: HttpInterceptor,
-        private authenticationService: AuthenticationService,
         private userTokenService: UserTokenService,
         private uberOAuth2Service: UberOAuth2Service) {
     }
@@ -39,7 +38,6 @@ export class UberRequestService {
             url = url + path;
         }
         let headers = new Headers({
-            'Content-Type': 'application/json',
             'Authorization': 'Token ' + serverToken
         });
         let options = new RequestOptions({ headers: headers, params: params });
@@ -50,6 +48,7 @@ export class UberRequestService {
         return apiResult;
     }
 
+    // TODO: cache latest token in localstorage
     getOAuth2(path: string, params: URLSearchParams, user: User): Observable<Response> {
         console.log('Searching for user "' + user.username + '"\'s tokens');
         // Get existing tokens for current user
@@ -182,7 +181,19 @@ export class UberRequestService {
                     return apiResp;
                 } else { // will fail; requires authorization redirect
                     console.log('Token access not yet authorized');
-                    let apiResponse: Observable<Response> = this.callAPI("", path, params).catch(this.handleError);
+                    //let apiResponse: Observable<Response> = this.callAPI("", path, params).catch(this.handleError);
+                    //let apiResponse = Observable.empty();
+                    // Use mock Response in case Uber CORS is broken
+                    let virtRespOpts: ResponseOptions = new ResponseOptions({
+                        body: null,
+                        status: 401,
+                        statusText: "Hard-coded 401 for invalid authorization.",
+                        headers: null,
+                        type: null,
+                        url: null
+                    });
+                    let virtResp: Response = new Response(virtRespOpts);
+                    let apiResponse: Observable<Response> = Observable.of(virtResp);
                     return apiResponse;
                 }
             }
@@ -195,7 +206,6 @@ export class UberRequestService {
         //let urlbase = 'https://sandbox-api.uber.com';
         let urlbase = 'https://api.uber.com';
         let headers = new Headers({
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token
         });
         let options = new RequestOptions({ headers: headers, params: params});

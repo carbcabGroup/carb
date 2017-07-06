@@ -2,14 +2,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
 import { HttpModule }    from '@angular/http';
+
+import { CoreModule }  from '../core/core.module'
 import { HttpInterceptorModule } from '../http-interceptor/http.interceptor.module'
 
 import { AppComponent }  from './app.component';
 import { routing }       from './app.routing';
 
 import { AuthGuard }     from './_guards/index';
-import { AuthenticationService,
-         UserService,
+import { UserService,
          UserConnectionService,
          UserTokenService,
          UberOAuth2Service,
@@ -23,6 +24,7 @@ import { UberAuthComponent }  from './uberauth/index';
         BrowserModule,
         FormsModule,
         HttpModule,
+        CoreModule,
         HttpInterceptorModule,
         routing
     ],
@@ -34,7 +36,6 @@ import { UberAuthComponent }  from './uberauth/index';
     ],
     providers: [
         AuthGuard,
-        AuthenticationService,
         UserService,
         UserTokenService,
         UserConnectionService,

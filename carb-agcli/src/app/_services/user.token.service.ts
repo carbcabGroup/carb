@@ -1,14 +1,13 @@
 ﻿import { Injectable } from '@angular/core';
 //import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
-import { Headers, RequestOptions, Response } from '@angular/http';
+import { RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
 import 'rxjs/add/operator/map'
 import 'rxjs/add/observable/of'
 
-import { AuthenticationService } from './index';
 import { UserTokenData } from '../_models/index';
 import { TokenDataRequestParams } from '../_models/index';
 import { TokenDataSearchParams } from '../_models/index';
@@ -16,10 +15,9 @@ import { TokenDataSearchParams } from '../_models/index';
 // Class to manage API calls as an async streaming service
 @Injectable()
 export class UserTokenService {
-    constructor(
-        private http: HttpInterceptor,
-        private authenticationService: AuthenticationService) {
-    }
+    public token: string;
+
+    constructor(private http: HttpInterceptor) {}
 
     // Get a specific token by id
     getUserToken(t_params: TokenDataRequestParams): Observable<UserTokenData[]> {
@@ -30,15 +28,13 @@ export class UserTokenService {
             return Observable.of(userTokens);
         }
         console.log('...tokens exist; continuing...');
-        // add authorization header with jwt token
+
         let urlbase = 'https://13.58.151.236:8088';
-        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        let options = new RequestOptions({ headers: headers });
 
         console.log('Retrieving token details...');
         let path = t_params.path + t_params.id[0] + '/';
         let url = urlbase + path;
-        let userTokens: Observable<UserTokenData[]> = this.http.get(url, options).map(r => {
+        let userTokens: Observable<UserTokenData[]> = this.http.get(url).map(r => {
             return mapTokenResp(r, t_params.serviceName);
         }).catch(this.handleError);
         return userTokens;
@@ -46,21 +42,20 @@ export class UserTokenService {
 
     // Get a specific  token by uuid
     getUserTokenByUuid(t_params: TokenDataSearchParams): Observable<UserTokenData[]> {
-        console.log('Getting "' + t_params.serviceName + '" details...');
+        console.log('Finding "' + t_params.serviceName + '" details...');
         if (!t_params.authUuid) {
             console.log('...invalid token state.');
             let userTokens: UserTokenData[] = [];
             return Observable.of(userTokens);
         }
-        console.log('...tokens exist; continuing...');
-        // add authorization header with jwt token
+        console.log('...UUID exists; continuing...');
+
         let urlbase = 'https://13.58.151.236:8088';
-        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let params = new URLSearchParams();
         params.set('search', t_params.authUuid);
-        let options = new RequestOptions({ headers: headers, params: params });
+        let options = new RequestOptions({ params: params });
 
-        console.log('Retrieving token details...');
+        console.log('Searching for token details...');
         let path = t_params.path;
         let url = urlbase + path;
         let userTokens: Observable<UserTokenData[]> = this.http.get(url, options).map(r => {
@@ -71,20 +66,18 @@ export class UserTokenService {
 
     saveToken(t_params: TokenDataRequestParams, token: UserTokenData): Observable<UserTokenData[]> {
         console.log('Saving "' + t_params.serviceName + '" details...');
-        // add authorization header with jwt token
+
         let urlbase = 'https://13.58.151.236:8088';
-        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let body = { access_token: token.access_token,
                      refresh_token: token.refresh_token,
                      access_token_exp: token.access_token_exp,
                      auth_code: token.auth_code,
                      auth_scope: token.auth_scope };
-        let options = new RequestOptions({ headers: headers });
 
         console.log('Saving token details...');
         let path = t_params.path + token.id + '/';
         let url = urlbase + path;
-        let userTokens: Observable<UserTokenData[]> = this.http.put(url, body, options).map(r => {
+        let userTokens: Observable<UserTokenData[]> = this.http.put(url, body).map(r => {
             return mapTokenResp(r, t_params.serviceName);
         }).catch(this.handleError);
         return userTokens;
@@ -93,15 +86,13 @@ export class UserTokenService {
     // Initialize empty token in database
     makeEmptyToken(t_params: TokenDataRequestParams): Observable<UserTokenData[]> {
         console.log('Creating empty "' + t_params.serviceName + '" token details...');
-        // add authorization header with jwt token
+
         let urlbase = 'https://13.58.151.236:8088';
-        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         let body = {};
-        let options = new RequestOptions({ headers: headers });
 
         let path = t_params.path;
         let url = urlbase + path;
-        let userTokens: Observable<UserTokenData[]> = this.http.post(url, body, options).map(r => {
+        let userTokens: Observable<UserTokenData[]> = this.http.post(url, body).map(r => {
             return mapTokenResp(r, t_params.serviceName);
         }).catch(this.handleError);
         return userTokens;
@@ -116,7 +107,8 @@ export class UserTokenService {
 
 // Static helpers
 function mapTokenResp(r: Response, n: string): UserTokenData[]{
-    console.log('Mapping a token API response...');
+    console.log('Mapping a token API response:');
+    console.log(r.json());
     let tokenData: UserTokenData = toUserTokenData(r.json());
     tokenData.serviceName = n;
     return [tokenData];

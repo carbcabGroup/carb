@@ -1,33 +1,26 @@
 ﻿import { Injectable } from '@angular/core';
 //import { Http, Headers, RequestOptions, Response } from '@angular/http';
 import { HttpInterceptor } from '../../http-interceptor/http.interceptor';
-import { Headers, RequestOptions, Response } from '@angular/http';
+import { Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/catch'
 import 'rxjs/add/observable/throw'
 
-import { AuthenticationService } from './index';
 import { User } from '../_models/index';
 
 @Injectable()
 export class UserService {
-    constructor(
-        private http: HttpInterceptor,
-        private authenticationService: AuthenticationService) {
-    }
+    constructor(private http: HttpInterceptor) {}
 
     getUsers(): Observable<User[]> {
-        // add authorization header with jwt token
         let urlbase = 'https://13.58.151.236:8088';
-        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        let options = new RequestOptions({ headers: headers });
 
         // get user overview
         console.log('Getting user details...');
         let path = '/users/';
         let url = urlbase + path;
-        let userResults: Observable<User[]> = this.http.get(url, options)
+        let userResults: Observable<User[]> = this.http.get(url)
             .map(mapUserResp).catch(this.handleError);
         console.log('User info:');
         console.log(userResults);

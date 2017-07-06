@@ -41,7 +41,7 @@ export class UberAuthComponent implements OnInit {
         console.log('Current parameters:');
         console.log(urlParams);
 
-        this.getAuth = !(urlParams['auth_code']);
+        this.getAuth = !(urlParams['code']);
         if (this.getAuth) {
             console.log('Redirecting to Uber authorization...');
             let authParams = new URLSearchParams();
@@ -66,6 +66,7 @@ export class UberAuthComponent implements OnInit {
                 if (tokens.length > 0) {
                     console.log('Updating token with new code...');
                     let t = tokens[0];
+                    console.log(t);
                     let t_params = <TokenDataRequestParams>({ serviceName: 'uber',
                                                               path: '/uber_token/',
                                                               id: [t.id] });
@@ -89,6 +90,8 @@ export class UberAuthComponent implements OnInit {
                         }
                     });
                     console.log('...done');
+                } else {
+                    console.log('Error retrieving token.');
                 }
             });
         }

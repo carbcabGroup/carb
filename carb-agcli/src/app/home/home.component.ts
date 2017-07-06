@@ -92,8 +92,9 @@ export class HomeComponent implements OnInit {
                 let uberOAuth2Response: Observable<Response> = this.uberRequestService
                     .getOAuth2(uberPath, uberParams, user);
                 uberOAuth2Response.subscribe(r => {
-                    console.log('Handling OAuth2 Uber API call');
-                    if (r) {
+                    console.log('Handling OAuth2 Uber API call response:');
+                    console.log(r);
+                    if (r.status == 200) {
                         this.uberOAuthString = r.status + ' ' + r.statusText;
                         if (r.json()) {
                             let s_json = JSON.stringify(r.json());
@@ -102,7 +103,7 @@ export class HomeComponent implements OnInit {
                             }
                             this.uberOAuthString = this.uberOAuthString + ': ' + s_json;
                         }
-                    } else { // Start with completely new token
+                    } else if (r.status == 401) { // Start with completely new token
                         let t_request = <TokenDataRequestParams>({ serviceName: 'uber',
                                                                    path: '/uber_token/',
                                                                    id: user.uber_token });
@@ -113,6 +114,8 @@ export class HomeComponent implements OnInit {
                                 this.router.navigate(['/uberauth'], { queryParams: {state: state} });
                             }
                         });
+                    } else {
+                        console.log('Unhandled response.');
                     }
                 });
             }
